@@ -17,8 +17,9 @@ public:
 	virtual void Logout(AController* player) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* player) override;
 	virtual void RestartPlayer(AController* newPlayer) override;
-private:
+
 	TArray<APlayerController*> playerControllers;
+private:
 	TSubclassOf<APawn> bodyguard;
 	TSubclassOf<APawn> researcher;
 };

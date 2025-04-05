@@ -23,6 +23,8 @@ AAtlantisCharacter::AAtlantisCharacter() {
 	debug->SetEnableGravity(false);
 	debug->bOwnerNoSee = true;
 	debug->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	debug->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	debug->CanCharacterStepUpOn = ECB_No;
 
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -37,6 +39,9 @@ AAtlantisCharacter::AAtlantisCharacter() {
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	GetCapsuleComponent()->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	GetCapsuleComponent()->CanCharacterStepUpOn = ECB_No;
 
 	bAlwaysRelevant = true;
 }

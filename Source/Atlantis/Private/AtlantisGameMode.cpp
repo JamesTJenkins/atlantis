@@ -9,12 +9,15 @@
 #include "Engine/World.h"
 #include "BodyguardPlayerCharacter.h"
 #include "ResearcherPlayerCharacter.h"
+#include "AtlantisPlayerState.h"
 
 AAtlantisGameMode::AAtlantisGameMode() : Super() {
 	static ConstructorHelpers::FClassFinder<AAtlantisCharacter> bodyguardCharacterClass(TEXT("/Game/Atlantis/Blueprints/BPC_Bodyguard"));
 	static ConstructorHelpers::FClassFinder<AAtlantisCharacter> researcherCharacterClass(TEXT("/Game/Atlantis/Blueprints/RPC_Researcher"));
 	bodyguard = bodyguardCharacterClass.Class;
 	researcher = researcherCharacterClass.Class;
+
+	PlayerStateClass = AAtlantisPlayerState::StaticClass();
 }
 
 void AAtlantisGameMode::PostLogin(APlayerController* newPlayer) {
@@ -30,37 +33,20 @@ void AAtlantisGameMode::Logout(AController* player) {
 }
 
 AActor* AAtlantisGameMode::ChoosePlayerStart_Implementation(AController* player) {
-	// Choose a player start
 	APlayerStart* foundPlayerStart = nullptr;
 	UClass* pawnClass = GetDefaultPawnClassForController(player);
-	APawn* pawnToFit = pawnClass ? pawnClass->GetDefaultObject<APawn>() : nullptr;
-	TArray<APlayerStart*> unOccupiedStartPoints;
-	TArray<APlayerStart*> occupiedStartPoints;
-	UWorld* World = GetWorld();
-	for(TActorIterator<APlayerStart> it(World); it; ++it) {
+	UWorld* world = GetWorld();
+	AAtlantisPlayerState* state = player->GetPlayerState<AAtlantisPlayerState>();
+	for(TActorIterator<APlayerStart> it(world); it; ++it) {
 		APlayerStart* playerStart = *it;
 
-		if(playerStart->IsA<APlayerStartPIE>()) {
-			// Always prefer the first "Play from Here" PlayerStart, if we find one while in PIE mode
-			foundPlayerStart = playerStart;
-			break;
-		} else {
-			FVector ActorLocation = playerStart->GetActorLocation();
-			const FRotator ActorRotation = playerStart->GetActorRotation();
-			if(!World->EncroachingBlockingGeometry(pawnToFit, ActorLocation, ActorRotation)) {
-				unOccupiedStartPoints.Add(playerStart);
-			} else if(World->FindTeleportSpot(pawnToFit, ActorLocation, ActorRotation)) {
-				occupiedStartPoints.Add(playerStart);
-			}
+		if(state->isBodyguard && playerStart->PlayerStartTag.Compare("Bodyguard")) {
+			return playerStart;
+		} else if (!state->isBodyguard && playerStart->PlayerStartTag.Compare("Researcher")) {
+			return playerStart;
 		}
 	}
-	if(foundPlayerStart == nullptr) {
-		if(unOccupiedStartPoints.Num() > 0) {
-			foundPlayerStart = unOccupiedStartPoints[FMath::RandRange(0, unOccupiedStartPoints.Num() - 1)];
-		} else if(occupiedStartPoints.Num() > 0) {
-			foundPlayerStart = occupiedStartPoints[FMath::RandRange(0, occupiedStartPoints.Num() - 1)];
-		}
-	}
+
 	return foundPlayerStart;
 }
 
@@ -71,8 +57,7 @@ void AAtlantisGameMode::RestartPlayer(AController* newPlayer) {
 
 	AActor* start = FindPlayerStart(newPlayer);
 
-	// Until player selection is added this will do
-	if (playerControllers.Num() == 1) {
+	if (newPlayer->GetPlayerState<AAtlantisPlayerState>()->isBodyguard) {
 		DefaultPawnClass = bodyguard;	// I could just make a proper spawner but this is far simpler
 	} else {
 		DefaultPawnClass = researcher;
