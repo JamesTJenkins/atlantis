@@ -28,5 +28,5 @@ void AAtlantisPlayerState::InitPlayerState() {
 	}
 
 	// Until player selection is added this will do
-	isBodyguard = gamemode->playerControllers.Num() == 1;
+	isBodyguard = gamemode->playerControllers.Num() == 0;
 }

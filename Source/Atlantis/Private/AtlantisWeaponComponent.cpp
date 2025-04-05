@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright James Jenkins All Rights Reserved.
 
 
 #include "AtlantisWeaponComponent.h"
@@ -19,13 +19,7 @@ UAtlantisWeaponComponent::UAtlantisWeaponComponent() {
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 }
 
-
 void UAtlantisWeaponComponent::Fire() {
-	if(Character == nullptr || Character->GetController() == nullptr) {
-		return;
-	}
-
-	// Try and fire a projectile
 	if(ProjectileClass != nullptr) {
 		UWorld* const World = GetWorld();
 		if(World != nullptr) {
@@ -43,14 +37,11 @@ void UAtlantisWeaponComponent::Fire() {
 		}
 	}
 
-	// Try and play the sound if specified
 	if(FireSound != nullptr) {
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
 	}
 
-	// Try and play a firing animation if specified
 	if(FireAnimation != nullptr) {
-		// Get the animation object for the arms mesh
 		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
 		if(AnimInstance != nullptr) {
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
@@ -70,33 +61,5 @@ bool UAtlantisWeaponComponent::AttachWeapon(AAtlantisCharacter* TargetCharacter)
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
 
-	// Set up action bindings
-	if(APlayerController* PlayerController = Cast<APlayerController>(Character->GetController())) {
-		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
-			// Set the priority of the mapping to 1, so that it overrides the Jump action with the Fire action when using touch input
-			Subsystem->AddMappingContext(FireMappingContext, 1);
-		}
-
-		if(UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent)) {
-			// Fire
-			EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &UAtlantisWeaponComponent::Fire);
-		}
-	}
-
 	return true;
-}
-
-void UAtlantisWeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason) {
-	// ensure we have a character owner
-	if(Character != nullptr) {
-		// remove the input mapping context from the Player Controller
-		if(APlayerController* PlayerController = Cast<APlayerController>(Character->GetController())) {
-			if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
-				Subsystem->RemoveMappingContext(FireMappingContext);
-			}
-		}
-	}
-
-	// maintain the EndPlay call chain
-	Super::EndPlay(EndPlayReason);
 }

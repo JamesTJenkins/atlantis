@@ -20,6 +20,16 @@ UCLASS(config = Game)
 class AAtlantisCharacter : public ACharacter {
 	GENERATED_BODY()
 public:
+	AAtlantisCharacter();
+
+	USkeletalMeshComponent* GetMesh1P() const {
+		return Mesh1P;
+	}
+
+	UCameraComponent* GetFirstPersonCameraComponent() const {
+		return FirstPersonCameraComponent;
+	}
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
 
@@ -40,20 +50,14 @@ public:
 	UInputAction* MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	UInputAction* LookAction;
 
-	AAtlantisCharacter();
-
-	USkeletalMeshComponent* GetMesh1P() const {
-		return Mesh1P;
-	}
-
-	UCameraComponent* GetFirstPersonCameraComponent() const {
-		return FirstPersonCameraComponent;
-	}
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* FireAction;
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	virtual void Fire() {}
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
