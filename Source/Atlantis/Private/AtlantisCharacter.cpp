@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
+#include "AtlantisWeaponComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -27,23 +28,36 @@ AAtlantisCharacter::AAtlantisCharacter() {
 	debug->CanCharacterStepUpOn = ECB_No;
 
 	// Create a CameraComponent	
-	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	firstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	firstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
+	firstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
+	firstPersonCameraComponent->bUsePawnControlRotation = true;
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
-	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(true);
-	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
-	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+	mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
+	mesh1P->SetOnlyOwnerSee(true);
+	mesh1P->SetupAttachment(firstPersonCameraComponent);
+	mesh1P->bCastDynamicShadow = false;
+	mesh1P->CastShadow = false;
+	mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	GetCapsuleComponent()->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECB_No;
 
 	bAlwaysRelevant = true;
+
+	UAtlantisWeaponComponent* primary = CreateDefaultSubobject<UAtlantisWeaponComponent>(TEXT("primary"));
+	primary->SetupAttachment(GetMesh1P(), FName(TEXT("GripPoint")));
+	primary->Character = this;
+	weapons.Add(primary);
+
+	UAtlantisWeaponComponent* secondary = CreateDefaultSubobject<UAtlantisWeaponComponent>(TEXT("secondary"));
+	secondary->SetupAttachment(GetMesh1P(), FName(TEXT("GripPoint")));
+	secondary->Character = this;
+	secondary->SetVisibility(false);
+	weapons.Add(secondary);
+
+	currentWeaponIndex = 0;
 }
 
 void AAtlantisCharacter::NotifyControllerChanged() {
@@ -51,18 +65,19 @@ void AAtlantisCharacter::NotifyControllerChanged() {
 
 	if(APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
 		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) {
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(defaultMappingContext, 0);
 		}
 	}
 }
 
 void AAtlantisCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
 	if(UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAtlantisCharacter::Move);
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAtlantisCharacter::Look);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Fire);
+		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &AAtlantisCharacter::Move);
+		EnhancedInputComponent->BindAction(lookAction, ETriggerEvent::Triggered, this, &AAtlantisCharacter::Look);
+		EnhancedInputComponent->BindAction(fireAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Fire);
+		EnhancedInputComponent->BindAction(switchWeaponAction, ETriggerEvent::Started, this, &AAtlantisCharacter::SwitchWeapon);
 	} else {
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
@@ -85,4 +100,18 @@ void AAtlantisCharacter::Look(const FInputActionValue& Value) {
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AAtlantisCharacter::Fire() {
+	if(weapons[currentWeaponIndex] == nullptr)
+		return;
+
+	weapons[currentWeaponIndex]->Fire();
+}
+
+void AAtlantisCharacter::SwitchWeapon() {
+	weapons[currentWeaponIndex]->SetVisibility(false);
+	currentWeaponIndex = (currentWeaponIndex + 1) % weapons.Num();
+	weapons[currentWeaponIndex]->SetVisibility(true);
+	NotifySwitchWeapon();
 }
