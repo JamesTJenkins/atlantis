@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright James Jenkins. All Rights Reserved.
 
 #pragma once
 
@@ -11,34 +11,36 @@ class AAtlantisCharacter;
 UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class ATLANTIS_API UAtlantisWeaponComponent : public USkeletalMeshComponent {
 	GENERATED_BODY()
-
 public:
-	/** Sets default values for this component's properties */
 	UAtlantisWeaponComponent();
 
-	// Call for pickups
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	bool AttachWeapon(AAtlantisCharacter* TargetCharacter);
-
-	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Fire();
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void Reload();
+
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AAtlantisProjectile> ProjectileClass;
+	TSubclassOf<class AAtlantisProjectile> projectileClass;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	USoundBase* FireSound;
+	USoundBase* fireSound;
 
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	UAnimMontage* FireAnimation;
+	UAnimMontage* fireAnimation;
 
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector MuzzleOffset;
+	FVector muzzleOffset;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int currentAmmoInMag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	int maxAmmoPerMag;
 
 	AAtlantisCharacter* Character;
 };

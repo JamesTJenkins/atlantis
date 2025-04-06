@@ -78,6 +78,7 @@ void AAtlantisCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(lookAction, ETriggerEvent::Triggered, this, &AAtlantisCharacter::Look);
 		EnhancedInputComponent->BindAction(fireAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Fire);
 		EnhancedInputComponent->BindAction(switchWeaponAction, ETriggerEvent::Started, this, &AAtlantisCharacter::SwitchWeapon);
+		EnhancedInputComponent->BindAction(reloadAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Reload);
 	} else {
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
@@ -107,6 +108,10 @@ void AAtlantisCharacter::Fire() {
 		return;
 
 	weapons[currentWeaponIndex]->Fire();
+}
+
+void AAtlantisCharacter::Reload() {
+	weapons[currentWeaponIndex]->Reload();
 }
 
 void AAtlantisCharacter::SwitchWeapon() {

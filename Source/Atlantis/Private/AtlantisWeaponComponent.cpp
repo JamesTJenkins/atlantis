@@ -1,5 +1,4 @@
-// Copyright James Jenkins All Rights Reserved.
-
+// Copyright James Jenkins. All Rights Reserved.
 
 #include "AtlantisWeaponComponent.h"
 #include "AtlantisCharacter.h"
@@ -7,59 +6,50 @@
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 
-// Sets default values for this component's properties
 UAtlantisWeaponComponent::UAtlantisWeaponComponent() {
-	// Default offset from the character location for projectiles to spawn
-	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f);
+	muzzleOffset = FVector(100.0f, 0.0f, 10.0f);
+	currentAmmoInMag = 1;
+	maxAmmoPerMag = 1;
 }
 
 void UAtlantisWeaponComponent::Fire() {
-	if(ProjectileClass != nullptr) {
-		UWorld* const World = GetWorld();
-		if(World != nullptr) {
-			APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-			const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
-			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-			const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
+	UWorld* const World = GetWorld();
+	if (World == nullptr || projectileClass == nullptr)
+		return;
 
-			//Set Spawn Collision Handling Override
-			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
-			// Spawn the projectile at the muzzle
-			World->SpawnActor<AAtlantisProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-		}
+	if (currentAmmoInMag == 0) {
+		Reload();	// Maybe make this an option in settings
+		return;
 	}
 
-	if(FireSound != nullptr) {
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, Character->GetActorLocation());
+	currentAmmoInMag--;
+	APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+	const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
+	// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+	const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(muzzleOffset);
+
+	FActorSpawnParameters ActorSpawnParams;
+	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+	World->SpawnActor<AAtlantisProjectile>(projectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+	if(fireSound != nullptr) {
+		UGameplayStatics::PlaySoundAtLocation(this, fireSound, Character->GetActorLocation());
 	}
 
-	if(FireAnimation != nullptr) {
+	// Maybe move this out of c++ and into bp like other animation stuff
+	if(fireAnimation != nullptr) {
 		UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance();
 		if(AnimInstance != nullptr) {
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
+			AnimInstance->Montage_Play(fireAnimation, 1.f);
 		}
 	}
 }
 
-bool UAtlantisWeaponComponent::AttachWeapon(AAtlantisCharacter* TargetCharacter) {
-	Character = TargetCharacter;
-
-	// Check that the character is valid, and has no weapon component yet
-	if(Character == nullptr || Character->GetInstanceComponents().FindItemByClass<UAtlantisWeaponComponent>()) {
-		return false;
-	}
-
-	// Attach the weapon to the First Person Character
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
-
-	return true;
+void UAtlantisWeaponComponent::Reload() {
+	currentAmmoInMag = maxAmmoPerMag;
 }
