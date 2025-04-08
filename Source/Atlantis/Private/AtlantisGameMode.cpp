@@ -18,6 +18,8 @@ AAtlantisGameMode::AAtlantisGameMode() : Super() {
 	researcher = researcherCharacterClass.Class;
 
 	PlayerStateClass = AAtlantisPlayerState::StaticClass();
+
+	bUseSeamlessTravel = true;
 }
 
 void AAtlantisGameMode::PostLogin(APlayerController* newPlayer) {
@@ -40,9 +42,9 @@ AActor* AAtlantisGameMode::ChoosePlayerStart_Implementation(AController* player)
 	for(TActorIterator<APlayerStart> it(world); it; ++it) {
 		APlayerStart* playerStart = *it;
 
-		if(state->isBodyguard && playerStart->PlayerStartTag.Compare("Bodyguard")) {
+		if(state->playerRole == EPlayerRole::Bodyguard && playerStart->PlayerStartTag.Compare("Bodyguard")) {
 			return playerStart;
-		} else if (!state->isBodyguard && playerStart->PlayerStartTag.Compare("Researcher")) {
+		} else if (state->playerRole == EPlayerRole::Researcher && playerStart->PlayerStartTag.Compare("Researcher")) {
 			return playerStart;
 		}
 	}
@@ -57,7 +59,7 @@ void AAtlantisGameMode::RestartPlayer(AController* newPlayer) {
 
 	AActor* start = FindPlayerStart(newPlayer);
 
-	if (newPlayer->GetPlayerState<AAtlantisPlayerState>()->isBodyguard) {
+	if (newPlayer->GetPlayerState<AAtlantisPlayerState>()->playerRole == EPlayerRole::Bodyguard) {
 		DefaultPawnClass = bodyguard;	// I could just make a proper spawner but this is far simpler
 	} else {
 		DefaultPawnClass = researcher;

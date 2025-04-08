@@ -2,6 +2,7 @@
 
 #include "AtlantisPlayerState.h"
 #include "AtlantisGameMode.h"
+#include <Net/UnrealNetwork.h>
 
 AAtlantisPlayerState::AAtlantisPlayerState() : Super() {
 	InitPlayerState();
@@ -27,6 +28,28 @@ void AAtlantisPlayerState::InitPlayerState() {
 		return;
 	}
 
-	// Until player selection is added this will do
-	isBodyguard = gamemode->playerControllers.Num() == 0;
+	FString map = world->OriginalWorldName.ToString();
+	if (map == "MainMenu") {
+		playerRole = EPlayerRole::None;
+	} else {
+		// This exists more for in editor testing purposes and in theory should never happen in normal games
+		playerRole = gamemode->playerControllers.Num() == 0 ? EPlayerRole::Bodyguard : EPlayerRole::Researcher;
+	}
+
+}
+
+void AAtlantisPlayerState::SetPlayerRole(EPlayerRole newRole) {
+	if (GetLocalRole() == ROLE_Authority) {
+		playerRole = newRole;
+		OnRep_PlayerRole();
+	}
+}
+
+void AAtlantisPlayerState::OnRep_PlayerRole() {
+	
+}
+
+void AAtlantisPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AAtlantisPlayerState, playerRole);
 }
