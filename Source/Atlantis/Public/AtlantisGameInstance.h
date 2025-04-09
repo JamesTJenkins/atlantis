@@ -41,5 +41,6 @@ protected:
 	virtual void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
 private:
 	TSharedPtr<FOnlineSessionSearch, ESPMode::ThreadSafe> SessionSearch;
+	FOnlineSessionSettings SessionSettings;
 	IOnlineSessionPtr SessionInterface;
 };
