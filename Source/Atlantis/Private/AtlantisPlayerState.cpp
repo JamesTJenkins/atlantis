@@ -28,8 +28,7 @@ void AAtlantisPlayerState::InitPlayerState() {
 		return;
 	}
 
-	FString map = world->OriginalWorldName.ToString();
-	if (map == "MainMenu") {
+	if (world->GetMapName().Contains("MainMenu")) {
 		playerRole = EPlayerRole::None;
 	} else {
 		// This exists more for in editor testing purposes and in theory should never happen in normal games
