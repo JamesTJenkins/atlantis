@@ -31,7 +31,7 @@ void AAtlantisPlayerState::InitPlayerState() {
 		return;
 	}
 
-	if (world->GetMapName().Contains("Lobby")) {
+	if (world->GetMapName().Contains("Lobby") || world->GetMapName().Contains("MainMenu")) {
 		playerRole = EPlayerRole::None;
 	} else {
 		// This exists more for in editor testing purposes and in theory should never happen in normal games

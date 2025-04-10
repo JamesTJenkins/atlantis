@@ -13,8 +13,10 @@
 #include "AtlantisGameInstance.h"
 
 AAtlantisGameMode::AAtlantisGameMode() : Super() {
+	static ConstructorHelpers::FClassFinder<APawn> menuPawnClass(TEXT("/Game/Atlantis/Blueprints/P_MenuPawn"));
 	static ConstructorHelpers::FClassFinder<AAtlantisCharacter> bodyguardCharacterClass(TEXT("/Game/Atlantis/Blueprints/BPC_Bodyguard"));
 	static ConstructorHelpers::FClassFinder<AAtlantisCharacter> researcherCharacterClass(TEXT("/Game/Atlantis/Blueprints/RPC_Researcher"));
+	menuPawn = menuPawnClass.Class;
 	bodyguard = bodyguardCharacterClass.Class;
 	researcher = researcherCharacterClass.Class;
 
@@ -53,6 +55,8 @@ AActor* AAtlantisGameMode::ChoosePlayerStart_Implementation(AController* player)
 			return playerStart;
 		} else if (state->playerRole == EPlayerRole::Researcher && playerStart->PlayerStartTag.Compare("Researcher")) {
 			return playerStart;
+		} else if(state->playerRole == EPlayerRole::None) {
+			return playerStart;
 		}
 	}
 
@@ -65,11 +69,14 @@ void AAtlantisGameMode::RestartPlayer(AController* newPlayer) {
 	}
 
 	AActor* start = FindPlayerStart(newPlayer);
+	AAtlantisPlayerState* state = newPlayer->GetPlayerState<AAtlantisPlayerState>();
 
-	if (newPlayer->GetPlayerState<AAtlantisPlayerState>()->playerRole == EPlayerRole::Bodyguard) {
+	if (state->playerRole == EPlayerRole::Bodyguard) {
 		DefaultPawnClass = bodyguard;	// I could just make a proper spawner but this is far simpler
-	} else {
+	} else if (state->playerRole == EPlayerRole::Researcher) {
 		DefaultPawnClass = researcher;
+	} else {
+		DefaultPawnClass = menuPawn;
 	}
 
 	RestartPlayerAtPlayerStart(newPlayer, start);

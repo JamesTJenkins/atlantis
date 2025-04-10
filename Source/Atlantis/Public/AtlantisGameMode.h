@@ -22,6 +22,7 @@ protected:
 public:
 	TArray<APlayerController*> playerControllers;
 private:
+	TSubclassOf<APawn> menuPawn;
 	TSubclassOf<APawn> bodyguard;
 	TSubclassOf<APawn> researcher;
 };
