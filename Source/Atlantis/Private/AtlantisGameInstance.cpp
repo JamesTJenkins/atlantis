@@ -6,6 +6,8 @@
 #include <Online\OnlineSessionNames.h>
 #include "OnlineSubsystemUtils.h"
 
+#define LOBBY_LEVEL_NAME FString("/Game/Atlantis/Levels/Lobby")
+
 UAtlantisGameInstance::UAtlantisGameInstance() : Super() {
 
 }
@@ -22,7 +24,7 @@ void UAtlantisGameInstance::Host(const FName& lobbyName, bool LAN, bool privateL
 	SessionSettings.NumPublicConnections = privateLobby ? 0 : 2;
 	SessionSettings.NumPrivateConnections = privateLobby ? 2 : 0;
 	SessionSettings.bShouldAdvertise = !privateLobby;
-	SessionSettings.Set(SETTING_MAPNAME, FString("MainMenu"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	SessionSettings.Set(SETTING_MAPNAME, LOBBY_LEVEL_NAME, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 	
 	SessionInterface->CreateSession(0, NAME_GameSession, SessionSettings);
 }
@@ -44,7 +46,6 @@ void UAtlantisGameInstance::Join(const FBlueprintSessionResult& sessionToJoin) {
 void UAtlantisGameInstance::FindSessions(bool LAN) {
 	SessionSearch->bIsLanQuery = LAN;
 	SessionSearch->MaxSearchResults = 30;
-	SessionSearch->QuerySettings.Set("SEARCH_PRESENCE", true, EOnlineComparisonOp::Equals);
 
 	SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 }
@@ -71,30 +72,34 @@ void UAtlantisGameInstance::Init() {
 void UAtlantisGameInstance::OnCreateSessionComplete(FName sessionName, bool succeeded) {
 	if(succeeded) {
 		UE_LOG(LogTemp, Log, TEXT("Created Server"));
-		// TODO: move to lobby screen
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("Failed to created Server"));
 	}
+
+	GetWorld()->ServerTravel(LOBBY_LEVEL_NAME + TEXT("?listen"));
 }
 
 void UAtlantisGameInstance::OnFindSessionComplete(bool succeeded) {
+	TArray<FBlueprintSessionResult> sessionResults;
+	
 	if(succeeded) {
 		UE_LOG(LogTemp, Log, TEXT("Completed session search"));
-		TArray<FBlueprintSessionResult> sessionResults;
 
 		for(FOnlineSessionSearchResult res : SessionSearch->SearchResults) {
 			FBlueprintSessionResult bpResult;
 			bpResult.OnlineResult = res;
 			sessionResults.Add(bpResult);
 		}
-
-		OnFoundLobbies.Broadcast(sessionResults);
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("Failed to find sessions"));
 	}
+
+	OnFoundLobbies.Broadcast(sessionResults);
 }
 
 void UAtlantisGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result) {
-	// TODO: move to lobby screen
-	UE_LOG(LogTemp, Warning, TEXT("Joined Server"));
+	UE_LOG(LogTemp, Warning, TEXT("%s"), LexToString(result));
+	FString connectString;
+	SessionInterface->GetResolvedConnectString(NAME_GameSession, connectString);
+	GetWorld()->GetFirstPlayerController()->ClientTravel(connectString, TRAVEL_Absolute);
 }

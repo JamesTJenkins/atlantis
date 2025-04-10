@@ -10,6 +10,7 @@
 #include "BodyguardPlayerCharacter.h"
 #include "ResearcherPlayerCharacter.h"
 #include "AtlantisPlayerState.h"
+#include "AtlantisGameInstance.h"
 
 AAtlantisGameMode::AAtlantisGameMode() : Super() {
 	static ConstructorHelpers::FClassFinder<AAtlantisCharacter> bodyguardCharacterClass(TEXT("/Game/Atlantis/Blueprints/BPC_Bodyguard"));
