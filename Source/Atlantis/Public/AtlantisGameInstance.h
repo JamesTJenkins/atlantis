@@ -39,6 +39,7 @@ protected:
 	virtual void OnCreateSessionComplete(FName sessionName, bool succeeded);
 	virtual void OnFindSessionComplete(bool succeeded);
 	virtual void OnJoinSessionComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result);
+	virtual void OnDestroySessionComplete(FName sessionName, bool succeeded);
 private:
 	TSharedPtr<FOnlineSessionSearch, ESPMode::ThreadSafe> SessionSearch;
 	FOnlineSessionSettings SessionSettings;

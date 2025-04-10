@@ -6,6 +6,7 @@
 #include <Online\OnlineSessionNames.h>
 #include "OnlineSubsystemUtils.h"
 
+#define MAINMENU_LEVEL_NAME FName("/Game/Atlantis/Levels/MainMenu")
 #define LOBBY_LEVEL_NAME FString("/Game/Atlantis/Levels/Lobby")
 
 UAtlantisGameInstance::UAtlantisGameInstance() : Super() {
@@ -51,7 +52,7 @@ void UAtlantisGameInstance::FindSessions(bool LAN) {
 }
 
 void UAtlantisGameInstance::Leave() {
-	
+	SessionInterface->DestroySession(NAME_GameSession);
 }
 
 void UAtlantisGameInstance::Init() {
@@ -63,6 +64,7 @@ void UAtlantisGameInstance::Init() {
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UAtlantisGameInstance::OnCreateSessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UAtlantisGameInstance::OnFindSessionComplete);
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UAtlantisGameInstance::OnJoinSessionComplete);
+			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UAtlantisGameInstance::OnDestroySessionComplete);
 		}
 	}
 
@@ -102,4 +104,8 @@ void UAtlantisGameInstance::OnJoinSessionComplete(FName sessionName, EOnJoinSess
 	FString connectString;
 	SessionInterface->GetResolvedConnectString(NAME_GameSession, connectString);
 	GetWorld()->GetFirstPlayerController()->ClientTravel(connectString, TRAVEL_Absolute);
+}
+
+void UAtlantisGameInstance::OnDestroySessionComplete(FName sessionName, bool succeeded) {
+	UGameplayStatics::OpenLevel(GetWorld(), MAINMENU_LEVEL_NAME);
 }
