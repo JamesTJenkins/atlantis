@@ -14,7 +14,7 @@ UAtlantisGameInstance::UAtlantisGameInstance() : Super() {
 }
 
 // TODO: update to use the lobbyname provided
-void UAtlantisGameInstance::Host(const FName& lobbyName, bool LAN, bool privateLobby) {
+void UAtlantisGameInstance::Host(const FString& sessionName, bool LAN, bool privateLobby) {
 	SessionSettings.bIsLANMatch = LAN;
 	SessionSettings.bAllowInvites = true;
 	SessionSettings.bAllowJoinInProgress = true;
@@ -26,7 +26,8 @@ void UAtlantisGameInstance::Host(const FName& lobbyName, bool LAN, bool privateL
 	SessionSettings.NumPrivateConnections = privateLobby ? 2 : 0;
 	SessionSettings.bShouldAdvertise = !privateLobby;
 	SessionSettings.Set(SETTING_MAPNAME, LOBBY_LEVEL_NAME, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-	
+	SessionSettings.Set(FName("SESSION_NAME"), sessionName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
 	SessionInterface->CreateSession(0, NAME_GameSession, SessionSettings);
 }
 

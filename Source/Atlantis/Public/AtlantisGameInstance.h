@@ -20,7 +20,7 @@ public:
 	FBlueprintFindSessionsResultDelegate OnFoundLobbies;
 
 	UFUNCTION(BlueprintCallable, Category = Network)
-	void Host(const FName& lobbyName, bool LAN, bool privateLobby);
+	void Host(const FString& sessionName, bool LAN, bool privateLobby);
 
 	UFUNCTION(BlueprintCallable, Category = Network)
 	void JoinViaIP(const FString& address, const int port = 7777);
