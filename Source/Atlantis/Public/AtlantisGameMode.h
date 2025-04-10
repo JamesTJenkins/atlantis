@@ -11,6 +11,9 @@ class AAtlantisGameMode : public AGameModeBase {
 	GENERATED_BODY()
 public:
 	AAtlantisGameMode();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = Network)
+	void ChangeLevel(const FString& levelName);
 protected:
 	virtual void PostLogin(APlayerController* newPlayer) override;
 	virtual void Logout(AController* player) override;

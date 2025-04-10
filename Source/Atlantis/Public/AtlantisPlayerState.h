@@ -18,23 +18,41 @@ public:
 
 	void InitPlayerState();
 
-	UPROPERTY(BlueprintAssignable, Category = Replication)
+	UFUNCTION(BlueprintCallable, Category = Network)
+	bool CheckIfRoleTaken(const EPlayerRole roleToCheck, FUniqueNetIdRepl& OutNetId);
+
+	// PROPERTYS
+
+	UPROPERTY(BlueprintAssignable, Category = Network)
 	FBlueprintPlayerStateUpdate OnRoleUpdate;
 
 	UFUNCTION(BlueprintCallable, Category = Gameplay)
 	void SetPlayerRole(EPlayerRole newRole);
 
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category = Network)
-	void RequestClaimRole(const EPlayerRole roleToClaim);
-
-	UFUNCTION(BlueprintCallable, Category = Network)
-	bool CheckIfRoleTaken(const EPlayerRole roleToCheck, FUniqueNetIdRepl& OutNetId);
+	UFUNCTION(BlueprintCallable, Category = Gameplay)
+	void SetPlayerReady(bool ready);
 
 	UPROPERTY(Replicated, ReplicatedUsing = OnRep_PlayerRole, BlueprintReadOnly, Category = Gameplay)
 	EPlayerRole playerRole;
 
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_PlayerReady, BlueprintReadOnly, Category = Gameplay)
+	bool playerReady;
+
 	UFUNCTION()
 	void OnRep_PlayerRole();
+
+	UFUNCTION()
+	void OnRep_PlayerReady();
+
+	// RPCs
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = Network)
+	void RequestClaimRole(const EPlayerRole roleToClaim);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category = Network)
+	void RequestPlayerReady(const bool ready);
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void CopyProperties(class APlayerState* PlayerState) override;
+	virtual void OverrideWith(class APlayerState* PlayerState) override;
 };

@@ -2,8 +2,10 @@
 
 #include "AtlantisPlayerState.h"
 #include "AtlantisGameMode.h"
-#include <Net/UnrealNetwork.h>
+#include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
+
+#define MAIN_LEVEL_NAME FString("/Game/FirstPerson/Maps/FirstPersonMap")
 
 AAtlantisPlayerState::AAtlantisPlayerState() : Super() {
 	InitPlayerState();
@@ -36,6 +38,7 @@ void AAtlantisPlayerState::InitPlayerState() {
 		playerRole = gamemode->playerControllers.Num() == 0 ? EPlayerRole::Bodyguard : EPlayerRole::Researcher;
 	}
 
+	playerReady = false;
 }
 
 void AAtlantisPlayerState::SetPlayerRole(EPlayerRole newRole) {
@@ -45,8 +48,19 @@ void AAtlantisPlayerState::SetPlayerRole(EPlayerRole newRole) {
 	}
 }
 
+void AAtlantisPlayerState::SetPlayerReady(bool ready) {
+	if (GetLocalRole() == ROLE_Authority) {
+		playerReady = ready;
+		OnRep_PlayerReady();
+	}
+}
+
 void AAtlantisPlayerState::OnRep_PlayerRole() {
 	OnRoleUpdate.Broadcast(this);
+}
+
+void AAtlantisPlayerState::OnRep_PlayerReady() {
+	
 }
 
 bool AAtlantisPlayerState::CheckIfRoleTaken(const EPlayerRole roleToCheck, FUniqueNetIdRepl& OutNetId) {
@@ -76,6 +90,11 @@ void AAtlantisPlayerState::RequestClaimRole_Implementation(const EPlayerRole rol
 	// Unclaim role
 	if(roleTaken && id == GetUniqueId()) {
 		SetPlayerRole(EPlayerRole::None);
+		
+		if (playerReady) {
+			SetPlayerReady(false);
+			UE_LOG(LogTemp, Log, TEXT("Player is no longer ready"));
+		}
 
 		UE_LOG(LogTemp, Log, TEXT("Role unclaimed"));
 		return;
@@ -92,7 +111,57 @@ void AAtlantisPlayerState::RequestClaimRole_Implementation(const EPlayerRole rol
 	UE_LOG(LogTemp, Log, TEXT("Role is already taken"));
 }
 
+void AAtlantisPlayerState::RequestPlayerReady_Implementation(const bool ready) {
+	if (ready && playerRole == EPlayerRole::None) {
+		UE_LOG(LogTemp, Log, TEXT("Cant ready up as role not selected"));
+		return;
+	}
+	
+	SetPlayerReady(ready);
+	UE_LOG(LogTemp, Log, TEXT("%hs"), ready ? "Player is ready" : "Player is not ready");
+
+	if (ready) {
+		AAtlantisGameMode* gamemode = Cast<AAtlantisGameMode>(GetWorld()->GetAuthGameMode());
+		int readyCount = 0;
+		for (APlayerController* pc : gamemode->playerControllers) {
+			AAtlantisPlayerState* state = Cast<AAtlantisPlayerState>(pc->PlayerState);
+
+			if (state->playerRole != EPlayerRole::None && state->playerReady) {
+				readyCount++;
+			}
+		}
+
+		if (readyCount >= 2) {
+			gamemode->ChangeLevel(MAIN_LEVEL_NAME);
+		}
+	}
+}
+
 void AAtlantisPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AAtlantisPlayerState, playerRole);
+}
+
+
+// Ready status is not copied over as that should be defaulted back to false
+void AAtlantisPlayerState::CopyProperties(APlayerState* PlayerState) {
+	Super::CopyProperties(PlayerState);
+
+	if (IsValid(PlayerState)) {
+		AAtlantisPlayerState* aState = Cast<AAtlantisPlayerState>(PlayerState);
+		if (IsValid(aState)) {
+			aState->SetPlayerRole(playerRole);
+		}
+	}
+}
+
+void AAtlantisPlayerState::OverrideWith(APlayerState* PlayerState) {
+	Super::OverrideWith(PlayerState);
+
+	if (IsValid(PlayerState)) {
+		AAtlantisPlayerState* aState = Cast<AAtlantisPlayerState>(PlayerState);
+		if (IsValid(aState)) {
+			SetPlayerRole(aState->playerRole);
+		}
+	}
 }

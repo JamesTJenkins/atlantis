@@ -23,6 +23,12 @@ AAtlantisGameMode::AAtlantisGameMode() : Super() {
 	bUseSeamlessTravel = true;
 }
 
+void AAtlantisGameMode::ChangeLevel_Implementation(const FString& levelName) {
+	GetWorld()->SeamlessTravel(levelName);
+	FString level = levelName;
+	ProcessClientTravel(level, true, false);
+}
+
 void AAtlantisGameMode::PostLogin(APlayerController* newPlayer) {
 	Super::PostLogin(newPlayer);
 
