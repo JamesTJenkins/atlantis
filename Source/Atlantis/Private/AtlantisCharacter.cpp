@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright James Jenkins All Rights Reserved.
 
 #include "AtlantisCharacter.h"
 #include "AtlantisProjectile.h"
@@ -11,10 +11,13 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "AtlantisWeaponComponent.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AAtlantisCharacter::AAtlantisCharacter() {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 	GetCapsuleComponent()->SetIsReplicated(true);
@@ -58,6 +61,10 @@ AAtlantisCharacter::AAtlantisCharacter() {
 	weapons.Add(secondary);
 
 	currentWeaponIndex = 0;
+	maxOxygen = 100;
+	oxygen = 100;
+	oxygenLossPerSecond = 1;
+	oxygenRegenPerSecond = 10;
 }
 
 void AAtlantisCharacter::NotifyControllerChanged() {
@@ -84,6 +91,28 @@ void AAtlantisCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
+void AAtlantisCharacter::Tick(float deltaTime) {
+	if(HasAuthority()) {
+		if (oxygenZoneCount > 0) {
+			oxygen = FMath::Clamp(oxygen + (oxygenRegenPerSecond * deltaTime), -1, maxOxygen);
+			//UE_LOG(LogTemp, Log, TEXT("Gaining air %f"), oxygen);
+		} else {
+			oxygen = FMath::Clamp(oxygen - (oxygenLossPerSecond * deltaTime), -1, maxOxygen);
+			//UE_LOG(LogTemp, Log, TEXT("Losing air %f"), oxygen);
+			
+			if(oxygen < 0) {
+				// TODO: come back once the player can actually die and respawn
+				UE_LOG(LogTemp, Log, TEXT("Died of lack of oxygen"));
+			}
+		}
+	}
+}
+
+void AAtlantisCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AAtlantisCharacter, oxygen);
+	DOREPLIFETIME(AAtlantisCharacter, maxOxygen);
+}
 
 void AAtlantisCharacter::Move(const FInputActionValue& Value) {
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -101,6 +130,14 @@ void AAtlantisCharacter::Look(const FInputActionValue& Value) {
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AAtlantisCharacter::OnRep_Oxygen() {
+	// TODO: will have to do UI
+}
+
+void AAtlantisCharacter::OnRep_MaxOxygen() {
+	// TODO: will have to do UI
 }
 
 void AAtlantisCharacter::Fire() {

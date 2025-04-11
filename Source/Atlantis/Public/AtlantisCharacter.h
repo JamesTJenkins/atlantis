@@ -61,12 +61,35 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* reloadAction;
+	
+	// Base Character Variables and functions
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
 	TArray<UAtlantisWeaponComponent*> weapons;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
 	int currentWeaponIndex;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Air)
+	float oxygenZoneCount;	// This uses an int instead of bool so player can move between oxygen zones without weird problems
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Air)
+	float oxygenRegenPerSecond;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Air)
+	float oxygenLossPerSecond;
+
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_MaxOxygen, VisibleAnywhere, BlueprintReadWrite, Category = Air)
+	float maxOxygen;
+
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_Oxygen, VisibleAnywhere, BlueprintReadWrite, Category = Air)
+	float oxygen;
+
+	UFUNCTION()
+	void OnRep_Oxygen();
+
+	UFUNCTION()
+	void OnRep_MaxOxygen();
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Weapons)
 	void NotifySwitchWeapon();
@@ -87,5 +110,9 @@ protected:
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+
+	virtual void Tick(float deltaTime) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
 
