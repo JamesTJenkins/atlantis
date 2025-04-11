@@ -72,6 +72,14 @@ protected:
 	void NotifySwitchWeapon();
 
 	void SwitchWeapon();
+	void HandleClientSideSwitchWeapon(int newWeaponIndex);
+
+	UFUNCTION(Server, Unreliable)
+	void RequestSwitchWeapon(int newWeaponIndex);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReplicateSwitchWeapon(int newWeaponIndex);
+
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Fire();

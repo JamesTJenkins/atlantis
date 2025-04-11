@@ -115,8 +115,32 @@ void AAtlantisCharacter::Reload() {
 }
 
 void AAtlantisCharacter::SwitchWeapon() {
+	int newIndex = (currentWeaponIndex + 1) % weapons.Num();
+	RequestSwitchWeapon(newIndex);
+
+	if (!HasAuthority()) {
+		HandleClientSideSwitchWeapon(newIndex);
+	}
+}
+
+void AAtlantisCharacter::HandleClientSideSwitchWeapon(int newWeaponIndex) {
+	if (newWeaponIndex == currentWeaponIndex)
+		return;
+
 	weapons[currentWeaponIndex]->SetVisibility(false);
-	currentWeaponIndex = (currentWeaponIndex + 1) % weapons.Num();
-	weapons[currentWeaponIndex]->SetVisibility(true);
+	weapons[newWeaponIndex]->SetVisibility(true);
+	currentWeaponIndex = newWeaponIndex;
+
 	NotifySwitchWeapon();
+}
+
+void AAtlantisCharacter::RequestSwitchWeapon_Implementation(int newWeaponIndex) {
+	if (newWeaponIndex < 0 || newWeaponIndex >= weapons.Num())
+		return;
+
+	ReplicateSwitchWeapon(newWeaponIndex);
+}
+
+void AAtlantisCharacter::ReplicateSwitchWeapon_Implementation(int newWeaponIndex) {
+	HandleClientSideSwitchWeapon(newWeaponIndex);
 }
