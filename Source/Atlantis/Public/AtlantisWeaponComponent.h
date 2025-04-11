@@ -20,6 +20,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Reload();
 
+	UFUNCTION(Server, Unreliable)
+	void RequestFire(const FRotator& cameraRotation);
+
+	UFUNCTION(Server, Reliable)
+	void RequestReload();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReloadComplete();
+
+	void HandleClientSideFire(const FRotator& cameraRotation);
+
+	void HandleClientSideReload();
+
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AAtlantisProjectile> projectileClass;
@@ -41,6 +54,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int maxAmmoPerMag;
+
+	bool requestedReload;
 
 	AAtlantisCharacter* Character;
 };

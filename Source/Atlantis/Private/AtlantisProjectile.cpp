@@ -23,8 +23,6 @@ AAtlantisProjectile::AAtlantisProjectile() {
 	ProjectileMovement->bShouldBounce = true;
 
 	InitialLifeSpan = 3.0f;
-
-	bReplicates = true;
 }
 
 void AAtlantisProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {

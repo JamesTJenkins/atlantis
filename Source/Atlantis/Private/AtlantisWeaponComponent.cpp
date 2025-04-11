@@ -14,28 +14,65 @@ UAtlantisWeaponComponent::UAtlantisWeaponComponent() {
 	muzzleOffset = FVector(100.0f, 0.0f, 10.0f);
 	currentAmmoInMag = 1;
 	maxAmmoPerMag = 1;
+	requestedReload = false;
 }
 
 void UAtlantisWeaponComponent::Fire() {
-	UWorld* const World = GetWorld();
-	if (World == nullptr || projectileClass == nullptr)
-		return;
-
 	if (currentAmmoInMag == 0) {
 		Reload();	// Maybe make this an option in settings
 		return;
 	}
 
+	APlayerController* playerController = Cast<APlayerController>(Character->GetController());
+	const FRotator cameraRotation = playerController->PlayerCameraManager->GetCameraRotation();
+
+	if(!Character->HasAuthority()) {
+		RequestFire(cameraRotation);
+	}
+
+	HandleClientSideFire(cameraRotation);
+}
+
+void UAtlantisWeaponComponent::Reload() {
+	if (requestedReload || currentAmmoInMag == maxAmmoPerMag)
+		return;
+
+	requestedReload = true;
+	RequestReload();
+	HandleClientSideReload();
+}
+
+void UAtlantisWeaponComponent::ReloadComplete_Implementation() {
+	currentAmmoInMag = maxAmmoPerMag;
+	requestedReload = false;
+}
+
+void UAtlantisWeaponComponent::RequestFire_Implementation(const FRotator& cameraRotation) {
+	HandleClientSideFire(cameraRotation);
+}
+
+void UAtlantisWeaponComponent::RequestReload_Implementation() {
+	HandleClientSideReload();
+
+	// TODO: Wait for reload complete animation or do a animation event
+	// call ReloadComplete afterwards to update self and client but for now we just call immediately
+	ReloadComplete();
+}
+
+void UAtlantisWeaponComponent::HandleClientSideFire(const FRotator& cameraRotation) {
 	currentAmmoInMag--;
-	APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-	const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
+
+	UWorld* const World = GetWorld();
+	if(World == nullptr || projectileClass == nullptr)
+		return;
+
 	// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-	const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(muzzleOffset);
+	const FVector spawnLocation = GetOwner()->GetActorLocation() + cameraRotation.RotateVector(muzzleOffset);
 
 	FActorSpawnParameters ActorSpawnParams;
-	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	World->SpawnActor<AAtlantisProjectile>(projectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+	World->SpawnActor<AAtlantisProjectile>(projectileClass, spawnLocation, cameraRotation, ActorSpawnParams);
 
 	if(fireSound != nullptr) {
 		UGameplayStatics::PlaySoundAtLocation(this, fireSound, Character->GetActorLocation());
@@ -50,6 +87,6 @@ void UAtlantisWeaponComponent::Fire() {
 	}
 }
 
-void UAtlantisWeaponComponent::Reload() {
-	currentAmmoInMag = maxAmmoPerMag;
+void UAtlantisWeaponComponent::HandleClientSideReload() {
+	// TODO: Do animation stuff here
 }
