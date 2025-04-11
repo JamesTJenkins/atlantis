@@ -23,6 +23,9 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void RequestFire(const FRotator& cameraRotation);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void FireComplete(const FRotator& cameraRotation);
+
 	UFUNCTION(Server, Reliable)
 	void RequestReload();
 
@@ -30,7 +33,7 @@ public:
 	void ReloadComplete();
 
 	void HandleClientSideFire(const FRotator& cameraRotation);
-
+	
 	void HandleClientSideReload();
 
 	/** Projectile class to spawn */

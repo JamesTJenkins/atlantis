@@ -9,6 +9,7 @@
 #include "Animation/AnimInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
+#include "Helper.h"
 
 UAtlantisWeaponComponent::UAtlantisWeaponComponent() {
 	muzzleOffset = FVector(100.0f, 0.0f, 10.0f);
@@ -25,38 +26,20 @@ void UAtlantisWeaponComponent::Fire() {
 
 	APlayerController* playerController = Cast<APlayerController>(Character->GetController());
 	const FRotator cameraRotation = playerController->PlayerCameraManager->GetCameraRotation();
-
-	if(!Character->HasAuthority()) {
-		RequestFire(cameraRotation);
-	}
-
+	RequestFire(cameraRotation);
 	HandleClientSideFire(cameraRotation);
-}
-
-void UAtlantisWeaponComponent::Reload() {
-	if (requestedReload || currentAmmoInMag == maxAmmoPerMag)
-		return;
-
-	requestedReload = true;
-	RequestReload();
-	HandleClientSideReload();
-}
-
-void UAtlantisWeaponComponent::ReloadComplete_Implementation() {
-	currentAmmoInMag = maxAmmoPerMag;
-	requestedReload = false;
 }
 
 void UAtlantisWeaponComponent::RequestFire_Implementation(const FRotator& cameraRotation) {
-	HandleClientSideFire(cameraRotation);
+	FireComplete(cameraRotation);
 }
 
-void UAtlantisWeaponComponent::RequestReload_Implementation() {
-	HandleClientSideReload();
+void UAtlantisWeaponComponent::FireComplete_Implementation(const FRotator& cameraRotation) {
+	// Check if charcter is played by local player as we will skip client side fire if so as already done
+	if(UHelper::IsControlledByLocalPlayer(GetWorld(), Character))
+		return;
 
-	// TODO: Wait for reload complete animation or do a animation event
-	// call ReloadComplete afterwards to update self and client but for now we just call immediately
-	ReloadComplete();
+	HandleClientSideFire(cameraRotation);
 }
 
 void UAtlantisWeaponComponent::HandleClientSideFire(const FRotator& cameraRotation) {
@@ -85,6 +68,31 @@ void UAtlantisWeaponComponent::HandleClientSideFire(const FRotator& cameraRotati
 			AnimInstance->Montage_Play(fireAnimation, 1.f);
 		}
 	}
+}
+
+void UAtlantisWeaponComponent::Reload() {
+	if(requestedReload || currentAmmoInMag == maxAmmoPerMag)
+		return;
+
+	requestedReload = true;
+	RequestReload();
+
+	if(!Character->HasAuthority()) {
+		HandleClientSideReload();
+	}
+}
+
+void UAtlantisWeaponComponent::RequestReload_Implementation() {
+	HandleClientSideReload();
+
+	// TODO: Wait for reload complete animation or do a animation event
+	// call ReloadComplete afterwards to update self and client but for now we just call immediately
+	ReloadComplete();
+}
+
+void UAtlantisWeaponComponent::ReloadComplete_Implementation() {
+	currentAmmoInMag = maxAmmoPerMag;
+	requestedReload = false;
 }
 
 void UAtlantisWeaponComponent::HandleClientSideReload() {
