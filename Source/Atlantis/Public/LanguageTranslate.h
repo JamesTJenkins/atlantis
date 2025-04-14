@@ -27,5 +27,6 @@ public:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
 private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Language, meta = (AllowPrivateAccess = "true"))
 	UText3DComponent* worldText;
 };
