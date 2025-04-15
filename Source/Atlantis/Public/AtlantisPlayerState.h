@@ -52,7 +52,11 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category = Network)
 	void RequestPlayerReady(const bool ready);
 protected:
+	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void CopyProperties(class APlayerState* PlayerState) override;
 	virtual void OverrideWith(class APlayerState* PlayerState) override;
+private:
+	TSubclassOf<AHUD> bodyguardHUD;
+	TSubclassOf<AHUD> researcherHUD;
 };

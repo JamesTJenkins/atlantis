@@ -4,10 +4,17 @@
 #include "AtlantisGameMode.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
+#include "BodyguardHUD.h"
+#include "ResearcherHUD.h"
 
 #define MAIN_LEVEL_NAME FString("/Game/FirstPerson/Maps/FirstPersonMap")
 
 AAtlantisPlayerState::AAtlantisPlayerState() : Super() {
+	static ConstructorHelpers::FClassFinder<ABodyguardHUD> bodyguardHUDClass(TEXT("/Game/Atlantis/HUD/BH_Bodyguard"));
+	static ConstructorHelpers::FClassFinder<AResearcherHUD> researcherHUDClass(TEXT("/Game/Atlantis/HUD/RH_Researcher"));
+	bodyguardHUD = bodyguardHUDClass.Class;
+	researcherHUD = researcherHUDClass.Class;
+
 	InitPlayerState();
 }
 
@@ -137,11 +144,22 @@ void AAtlantisPlayerState::RequestPlayerReady_Implementation(const bool ready) {
 	}
 }
 
+void AAtlantisPlayerState::BeginPlay() {
+	APlayerController* player = GetPlayerController();
+	if (player == nullptr)
+		return;
+
+	if (playerRole == EPlayerRole::Bodyguard) {
+		player->ClientSetHUD(bodyguardHUD);
+	} else if(playerRole == EPlayerRole::Researcher) {
+		player->ClientSetHUD(researcherHUD);
+	}
+}
+
 void AAtlantisPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AAtlantisPlayerState, playerRole);
 }
-
 
 // Ready status is not copied over as that should be defaulted back to false
 void AAtlantisPlayerState::CopyProperties(APlayerState* PlayerState) {
