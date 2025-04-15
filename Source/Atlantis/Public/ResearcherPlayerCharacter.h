@@ -10,4 +10,9 @@ UCLASS()
 class ATLANTIS_API AResearcherPlayerCharacter : public AAtlantisCharacter {
 	GENERATED_BODY()
 public:
+	AResearcherPlayerCharacter();
+
+	ABaseInteractable* currentInteractable;
+protected:
+	virtual void Tick(float deltaTime) override;
 };

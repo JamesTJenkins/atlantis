@@ -13,6 +13,7 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 class UAtlantisWeaponComponent;
+class ABaseInteractable;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -61,6 +62,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* reloadAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* interactAction;
 	
 	// Base Character Variables and functions
 
@@ -69,6 +73,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
 	int currentWeaponIndex;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Interaction, meta = (AllowPrivateAccess = "true"))
+	float interactDistance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Air)
 	float oxygenZoneCount;	// This uses an int instead of bool so player can move between oxygen zones without weird problems
@@ -103,10 +110,18 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void ReplicateSwitchWeapon(int newWeaponIndex);
 
+	void Interact();
+
+	// Theres no replicate callback as interaction will be handled by the actor that is being interacted with instead
+	UFUNCTION(Server, Unreliable)
+	void RequestInteract();
+
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Fire();
 	void Reload();
+
+	ABaseInteractable* GetInteractable();
 
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;

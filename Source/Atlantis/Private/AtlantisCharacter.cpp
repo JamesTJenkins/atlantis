@@ -12,6 +12,7 @@
 #include "Engine/LocalPlayer.h"
 #include "AtlantisWeaponComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "BaseInteractable.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -61,6 +62,7 @@ AAtlantisCharacter::AAtlantisCharacter() {
 	weapons.Add(secondary);
 
 	currentWeaponIndex = 0;
+	interactDistance = 500;
 	maxOxygen = 100;
 	oxygen = 100;
 	oxygenLossPerSecond = 1;
@@ -86,6 +88,7 @@ void AAtlantisCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(fireAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Fire);
 		EnhancedInputComponent->BindAction(switchWeaponAction, ETriggerEvent::Started, this, &AAtlantisCharacter::SwitchWeapon);
 		EnhancedInputComponent->BindAction(reloadAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Reload);
+		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Interact);
 	} else {
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
@@ -149,6 +152,33 @@ void AAtlantisCharacter::Fire() {
 
 void AAtlantisCharacter::Reload() {
 	weapons[currentWeaponIndex]->Reload();
+}
+
+ABaseInteractable* AAtlantisCharacter::GetInteractable() {
+	FVector start = firstPersonCameraComponent->GetComponentLocation();
+	FVector end = start + firstPersonCameraComponent->GetForwardVector() * interactDistance;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+
+	FHitResult result;
+	if(GetWorld()->LineTraceSingleByChannel(result, start, end, ECC_Visibility, params)) {
+		return Cast<ABaseInteractable>(result.GetActor());
+	}
+
+	return nullptr;
+}
+
+void AAtlantisCharacter::Interact() {
+	// Might want to do other stuff in here like a hold to interact or even handle validation here
+	// rather than leaving it to the server to validate
+	
+	RequestInteract();
+}
+
+void AAtlantisCharacter::RequestInteract_Implementation() {
+	if(ABaseInteractable* interactable = GetInteractable()) {
+		interactable->OnInteract(this);
+	}
 }
 
 void AAtlantisCharacter::SwitchWeapon() {
