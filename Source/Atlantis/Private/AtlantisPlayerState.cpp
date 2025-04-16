@@ -10,6 +10,8 @@
 #define MAIN_LEVEL_NAME FString("/Game/FirstPerson/Maps/FirstPersonMap")
 
 AAtlantisPlayerState::AAtlantisPlayerState() : Super() {
+	PrimaryActorTick.bCanEverTick = false;
+
 	static ConstructorHelpers::FClassFinder<ABodyguardHUD> bodyguardHUDClass(TEXT("/Game/Atlantis/HUD/BH_Bodyguard"));
 	static ConstructorHelpers::FClassFinder<AResearcherHUD> researcherHUDClass(TEXT("/Game/Atlantis/HUD/RH_Researcher"));
 	bodyguardHUD = bodyguardHUDClass.Class;
@@ -145,6 +147,8 @@ void AAtlantisPlayerState::RequestPlayerReady_Implementation(const bool ready) {
 }
 
 void AAtlantisPlayerState::BeginPlay() {
+	Super::BeginPlay();
+
 	APlayerController* player = GetPlayerController();
 	if (player == nullptr)
 		return;
