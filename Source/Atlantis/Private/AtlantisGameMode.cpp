@@ -16,9 +16,14 @@ AAtlantisGameMode::AAtlantisGameMode() : Super() {
 	static ConstructorHelpers::FClassFinder<APawn> menuPawnClass(TEXT("/Game/Atlantis/Blueprints/P_MenuPawn"));
 	static ConstructorHelpers::FClassFinder<AAtlantisCharacter> bodyguardCharacterClass(TEXT("/Game/Atlantis/Blueprints/BPC_Bodyguard"));
 	static ConstructorHelpers::FClassFinder<AAtlantisCharacter> researcherCharacterClass(TEXT("/Game/Atlantis/Blueprints/RPC_Researcher"));
+	static ConstructorHelpers::FClassFinder<APawn> prologueBodyguardPawnClass(TEXT("/Game/Atlantis/Blueprints/PP_Bodyguard"));
+	static ConstructorHelpers::FClassFinder<APawn> prologueResearcherPawnClass(TEXT("/Game/Atlantis/Blueprints/PP_Researcher"));
+	
 	menuPawn = menuPawnClass.Class;
 	bodyguard = bodyguardCharacterClass.Class;
 	researcher = researcherCharacterClass.Class;
+	prologueBodyguard = prologueBodyguardPawnClass.Class;
+	prologueResearcher = prologueResearcherPawnClass.Class;
 
 	PlayerStateClass = AAtlantisPlayerState::StaticClass();
 
@@ -71,10 +76,12 @@ void AAtlantisGameMode::RestartPlayer(AController* newPlayer) {
 	AActor* start = FindPlayerStart(newPlayer);
 	AAtlantisPlayerState* state = newPlayer->GetPlayerState<AAtlantisPlayerState>();
 
+	// I could just make a proper spawner but this is far simpler
+	bool inPrologue = GetWorld()->GetMapName().Contains("Prologue");
 	if (state->playerRole == EPlayerRole::Bodyguard) {
-		DefaultPawnClass = bodyguard;	// I could just make a proper spawner but this is far simpler
+		DefaultPawnClass = inPrologue ? prologueBodyguard : bodyguard;
 	} else if (state->playerRole == EPlayerRole::Researcher) {
-		DefaultPawnClass = researcher;
+		DefaultPawnClass = inPrologue ? prologueResearcher : researcher;
 	} else {
 		DefaultPawnClass = menuPawn;
 	}
