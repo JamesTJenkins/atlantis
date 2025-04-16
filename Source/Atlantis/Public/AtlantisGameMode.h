@@ -25,4 +25,6 @@ private:
 	TSubclassOf<APawn> menuPawn;
 	TSubclassOf<APawn> bodyguard;
 	TSubclassOf<APawn> researcher;
+	TSubclassOf<APawn> prologueBodyguard;
+	TSubclassOf<APawn> prologueResearcher;
 };

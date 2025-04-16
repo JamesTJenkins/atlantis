@@ -7,7 +7,7 @@
 #include "BodyguardHUD.h"
 #include "ResearcherHUD.h"
 
-#define MAIN_LEVEL_NAME FString("/Game/FirstPerson/Maps/FirstPersonMap")
+#define PROLOGUE_LEVEL_NAME FString("/Game/Atlantis/Levels/Prologue")
 
 AAtlantisPlayerState::AAtlantisPlayerState() : Super() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -141,7 +141,7 @@ void AAtlantisPlayerState::RequestPlayerReady_Implementation(const bool ready) {
 		}
 
 		if (readyCount >= 2) {
-			gamemode->ChangeLevel(MAIN_LEVEL_NAME);
+			gamemode->ChangeLevel(PROLOGUE_LEVEL_NAME);
 		}
 	}
 }
