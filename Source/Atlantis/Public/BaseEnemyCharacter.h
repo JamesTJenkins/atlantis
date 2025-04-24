@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
 	float health;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats)
+	float damage;
+
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = Patrol)
 	TArray<APatrolPoint*> patrolPoints;
 };
