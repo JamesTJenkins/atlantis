@@ -9,7 +9,7 @@
 #include "AtlantisDefines.h"
 
 UBTTask_FindRandomPatrolTask::UBTTask_FindRandomPatrolTask() : Super() {
-	NodeName = "FindRandomPatrol";
+	NodeName = "Find Random Patrol Point";
 }
 
 EBTNodeResult::Type UBTTask_FindRandomPatrolTask::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
