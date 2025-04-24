@@ -68,6 +68,21 @@ public:
 	
 	// Base Character Variables and functions
 
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_MaxHealth, VisibleAnywhere, BlueprintReadWrite, Category = Stats)
+	float maxHealth;
+
+	UPROPERTY(Replicated, ReplicatedUsing = OnRep_Health, VisibleAnywhere, BlueprintReadWrite, Category = Stats)
+	float health;
+
+	UFUNCTION()
+	void OnRep_MaxHealth();
+
+	UFUNCTION()
+	void OnRep_Health();
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = Movement)
+	bool movementEnabled;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
 	TArray<UAtlantisWeaponComponent*> weapons;
 

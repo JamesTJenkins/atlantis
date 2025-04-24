@@ -13,6 +13,7 @@
 #include "AtlantisWeaponComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "BaseInteractable.h"
+#include "AtlantisDefines.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -61,6 +62,11 @@ AAtlantisCharacter::AAtlantisCharacter() {
 	secondary->SetVisibility(false);
 	weapons.Add(secondary);
 
+	Tags.Add(PLAYER_TAG);
+
+	movementEnabled = true;
+	maxHealth = 100;
+	health = 100;
 	currentWeaponIndex = 0;
 	interactDistance = 500;
 	maxOxygen = 100;
@@ -118,6 +124,9 @@ void AAtlantisCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 }
 
 void AAtlantisCharacter::Move(const FInputActionValue& Value) {
+	if (!movementEnabled)
+		return;
+
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if(Controller != nullptr) {
@@ -127,12 +136,23 @@ void AAtlantisCharacter::Move(const FInputActionValue& Value) {
 }
 
 void AAtlantisCharacter::Look(const FInputActionValue& Value) {
+	if(!movementEnabled)
+		return;
+
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if(Controller != nullptr) {
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AAtlantisCharacter::OnRep_MaxHealth() {
+	// TODO: will have to do UI
+}
+
+void AAtlantisCharacter::OnRep_Health() {
+	// TODO: will have to do UI
 }
 
 void AAtlantisCharacter::OnRep_Oxygen() {
