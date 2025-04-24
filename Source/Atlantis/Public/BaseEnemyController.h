@@ -26,6 +26,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	UBlackboardData* blackboardData;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	float attackRange;
 protected:
 	virtual void BeginPlay() override;
 	virtual void ActorsPerceptionUpdated(const TArray<AActor*>& updatedActors) override;
@@ -42,6 +45,9 @@ private:
 	// Perception component is on the AAIController by default so dont need to add here
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	UAISenseConfig_Sight* sightConfig;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	float timeToLoseSight;
 
 	FTimerHandle lostLineOfSight;
 };

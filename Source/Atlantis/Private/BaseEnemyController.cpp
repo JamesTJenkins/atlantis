@@ -22,10 +22,13 @@ ABaseEnemyController::ABaseEnemyController() : Super() {
 	sightConfig->SightRadius = 500;
 	sightConfig->LoseSightRadius = 600;
 	sightConfig->PeripheralVisionAngleDegrees = 90;
-	sightConfig->SetMaxAge(5);
+	sightConfig->SetMaxAge(1.5f);
 
 	PerceptionComponent->ConfigureSense(*sightConfig);
 	PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
+
+	timeToLoseSight = 2;
+	attackRange = 250;
 }
 
 void ABaseEnemyController::BeginPlay() {
@@ -45,25 +48,13 @@ void ABaseEnemyController::ActorsPerceptionUpdated(const TArray<AActor*>& update
 			FActorPerceptionBlueprintInfo info;
 			if (PerceptionComponent->GetActorsPerception(actor, info)) {
 				AAtlantisCharacter* currentEnemy = Cast<AAtlantisCharacter>(blackboardComp->GetValueAsObject(ENEMY_KEY));
-				bool isSighted = info.LastSensedStimuli.Num() > 0;
-
+				bool isSighted = info.LastSensedStimuli[info.LastSensedStimuli.Num() - 1].WasSuccessfullySensed();
+				
 				if (currentEnemy != actor && isSighted) {
-					// Check if new enemy player should be target or not
 					if (!currentEnemy) {
-						// Set as target enemy as there is none selected currently
 						SetNewEnemyTarget(actor);
-					} else {
-						// Target whichever player is closer
-						float currentEnemyDist = FVector::Distance(GetCharacter()->GetActorLocation(), currentEnemy->GetActorLocation());
-						float newEnemyDist = FVector::Distance(GetCharacter()->GetActorLocation(), actor->GetActorLocation());
-					
-						if(newEnemyDist < currentEnemyDist) {
-							SetNewEnemyTarget(actor);
-						}
 					}
 				} else {
-					blackboardComp->SetValueAsBool(HAS_LINE_OF_SIGHT_KEY, isSighted);
-
 					if(isSighted) {
 						CancelLostSightTimer();
 					} else {
@@ -71,18 +62,19 @@ void ABaseEnemyController::ActorsPerceptionUpdated(const TArray<AActor*>& update
 					}
 				}
 			}
+		} else {
+			PerceptionComponent->ForgetActor(actor);
 		}
 	}
 }
 
 void ABaseEnemyController::SetNewEnemyTarget(AActor* actor) {
 	blackboardComp->SetValueAsObject(ENEMY_KEY, actor);
-	blackboardComp->SetValueAsBool(HAS_LINE_OF_SIGHT_KEY, true);
 	CancelLostSightTimer();
 }
 
 void ABaseEnemyController::StartLostSightTimer() {
-	GetWorld()->GetTimerManager().SetTimer(lostLineOfSight, this, &ABaseEnemyController::LostSight, 2, false);
+	GetWorld()->GetTimerManager().SetTimer(lostLineOfSight, this, &ABaseEnemyController::LostSight, timeToLoseSight, false);
 }
 
 void ABaseEnemyController::CancelLostSightTimer() {
@@ -93,5 +85,4 @@ void ABaseEnemyController::CancelLostSightTimer() {
 
 void ABaseEnemyController::LostSight() {
 	blackboardComp->SetValueAsObject(ENEMY_KEY, nullptr);
-	blackboardComp->SetValueAsBool(HAS_LINE_OF_SIGHT_KEY, false);
 }
