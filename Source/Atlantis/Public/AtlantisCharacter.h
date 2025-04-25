@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CharacterInterface.h"
 #include "Logging/LogMacros.h"
 #include "AtlantisCharacter.generated.h"
 
@@ -19,7 +20,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config = Game)
-class AAtlantisCharacter : public ACharacter {
+class AAtlantisCharacter : public ACharacter, public ICharacterInterface {
 	GENERATED_BODY()
 public:
 	AAtlantisCharacter();
@@ -112,6 +113,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxOxygen();
+
+	UFUNCTION()
+	virtual void UpdateHealth(float value) override;
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Weapons)
 	void NotifySwitchWeapon();

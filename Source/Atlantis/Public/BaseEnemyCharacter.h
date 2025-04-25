@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CharacterInterface.h"
 #include "PatrolPoint.h"
 #include "BaseEnemyCharacter.generated.h"
 
@@ -11,7 +12,7 @@
 // for the enemies so only the server needs to know
 
 UCLASS()
-class ATLANTIS_API ABaseEnemyCharacter : public ACharacter {
+class ATLANTIS_API ABaseEnemyCharacter : public ACharacter, public ICharacterInterface {
 	GENERATED_BODY()
 public:
 	ABaseEnemyCharacter();
@@ -27,4 +28,7 @@ public:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = Patrol)
 	TArray<APatrolPoint*> patrolPoints;
+
+	UFUNCTION()
+	virtual void UpdateHealth(float value) override;
 };
