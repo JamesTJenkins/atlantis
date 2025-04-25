@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright James Jenkins. All Rights Reserved.
 
 #include "AtlantisProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -23,6 +23,8 @@ AAtlantisProjectile::AAtlantisProjectile() {
 	ProjectileMovement->bShouldBounce = true;
 
 	InitialLifeSpan = 3.0f;
+
+	damage = 0;	// This gets set by the weapon shooting it
 }
 
 void AAtlantisProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {

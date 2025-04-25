@@ -36,21 +36,20 @@ public:
 	
 	void HandleClientSideReload();
 
-	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AAtlantisProjectile> projectileClass;
 
-	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	USoundBase* fireSound;
 
-	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimMontage* fireAnimation;
 
-	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector muzzleOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float damagePerShot;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int currentAmmoInMag;
