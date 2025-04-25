@@ -22,7 +22,7 @@ EBTNodeResult::Type UBTTask_AttackTask::ExecuteTask(UBehaviorTreeComponent& owne
 			ABaseEnemyCharacter* bec = Cast<ABaseEnemyCharacter>(controller->GetCharacter());
 			AAtlantisCharacter* ac = Cast<AAtlantisCharacter>(bb->GetValueAsObject(ENEMY_KEY));
 			
-			ac->health -= bec->damage;
+			ac->UpdateHealth(-bec->damage);
 
 			FinishLatentTask(ownerComp, EBTNodeResult::Succeeded);
 			return EBTNodeResult::Succeeded;

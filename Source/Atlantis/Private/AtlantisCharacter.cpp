@@ -163,6 +163,15 @@ void AAtlantisCharacter::OnRep_MaxOxygen() {
 	// TODO: will have to do UI
 }
 
+void AAtlantisCharacter::UpdateHealth(float value) {
+	health += value;
+
+	if(health < value) {
+		// TODO: implement respawns or revive mechanic
+		UE_LOG(LogTemp, Log, TEXT("Player died"));
+	}
+}
+
 void AAtlantisCharacter::Fire() {
 	if(weapons[currentWeaponIndex] == nullptr)
 		return;

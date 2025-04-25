@@ -3,6 +3,7 @@
 #include "AtlantisProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "CharacterInterface.h"
 
 AAtlantisProjectile::AAtlantisProjectile() {
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
@@ -28,8 +29,13 @@ AAtlantisProjectile::AAtlantisProjectile() {
 }
 
 void AAtlantisProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
-	if((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics()) {
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+	if(OtherActor && OtherComp && OtherActor != this) {
+		if(ICharacterInterface* enemy = Cast<ICharacterInterface>(OtherActor)) {
+			enemy->UpdateHealth(-damage);
+		} else {
+			if (OtherComp->IsSimulatingPhysics())
+				OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		}
 
 		Destroy();
 	}
