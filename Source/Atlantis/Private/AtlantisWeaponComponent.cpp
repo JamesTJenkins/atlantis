@@ -13,6 +13,7 @@
 
 UAtlantisWeaponComponent::UAtlantisWeaponComponent() {
 	muzzleOffset = FVector(100.0f, 0.0f, 10.0f);
+	damagePerShot = 10;
 	currentAmmoInMag = 1;
 	maxAmmoPerMag = 1;
 	requestedReload = false;
@@ -55,7 +56,8 @@ void UAtlantisWeaponComponent::HandleClientSideFire(const FRotator& cameraRotati
 	FActorSpawnParameters ActorSpawnParams;
 	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	World->SpawnActor<AAtlantisProjectile>(projectileClass, spawnLocation, cameraRotation, ActorSpawnParams);
+	AAtlantisProjectile* projectile = World->SpawnActor<AAtlantisProjectile>(projectileClass, spawnLocation, cameraRotation, ActorSpawnParams);
+	projectile->damage = damagePerShot;
 
 	if(fireSound != nullptr) {
 		UGameplayStatics::PlaySoundAtLocation(this, fireSound, Character->GetActorLocation());
