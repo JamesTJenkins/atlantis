@@ -1,6 +1,6 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "CommsWidget.h"
+#include "Widgets/CommsWidget.h"
 
 FText UCommsWidget::GetNextDialog() {
 	currentDialogIndex++;

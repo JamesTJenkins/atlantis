@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OxygenZone.generated.h"
+#include "OxygenZoneSphere.generated.h"
 
-class UBoxComponent;
+class USphereComponent;
 
 UCLASS()
-class AOxygenZone : public AActor {
+class AOxygenZoneSphere : public AActor {
 	GENERATED_BODY()
 public:
-	AOxygenZone();
+	AOxygenZoneSphere();
 protected:
 	UFUNCTION()
 	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -20,5 +20,5 @@ protected:
 	void OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 private:
 	UPROPERTY(VisibleAnywhere, Category = Air)
-	UBoxComponent* triggerVolume;
+	USphereComponent* triggerVolume;
 };

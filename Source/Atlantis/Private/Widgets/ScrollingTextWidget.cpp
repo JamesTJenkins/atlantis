@@ -1,6 +1,6 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "ScrollingTextWidget.h"
+#include "Widgets/ScrollingTextWidget.h"
 #include "Components/TextBlock.h"
 #include "TimerManager.h"
 
