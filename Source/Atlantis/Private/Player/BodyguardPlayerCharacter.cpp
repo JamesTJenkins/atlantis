@@ -1,6 +1,6 @@
 // Copyright James Jenkins All Rights Reserved.
 
 
-#include "BodyguardPlayerCharacter.h"
+#include "Player/BodyguardPlayerCharacter.h"
 
 ABodyguardPlayerCharacter::ABodyguardPlayerCharacter() : Super() {}

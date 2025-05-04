@@ -1,6 +1,6 @@
 // Copyright James Jenkins All Rights Reserved.
 
-#include "BaseEnemyCharacter.h"
+#include "Enemy/BaseEnemyCharacter.h"
 
 ABaseEnemyCharacter::ABaseEnemyCharacter() : Super() {
 	maxHealth = 100;

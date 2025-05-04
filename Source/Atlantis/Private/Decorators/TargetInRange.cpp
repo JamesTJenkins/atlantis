@@ -3,7 +3,7 @@
 #include "Decorators/TargetInRange.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "BaseEnemyController.h"
+#include "Enemy/BaseEnemyController.h"
 #include "GameFramework/Character.h"
 
 UTargetInRange::UTargetInRange() {

@@ -4,9 +4,9 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
-#include "BaseEnemyCharacter.h"
+#include "Enemy/BaseEnemyCharacter.h"
 #include "AtlantisDefines.h"
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 
 UBTTask_AttackTask::UBTTask_AttackTask() : Super() {
 	NodeName = "Attack Player";

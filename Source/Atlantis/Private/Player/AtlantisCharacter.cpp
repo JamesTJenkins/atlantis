@@ -1,6 +1,6 @@
 // Copyright James Jenkins All Rights Reserved.
 
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 #include "AtlantisProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -12,7 +12,7 @@
 #include "Engine/LocalPlayer.h"
 #include "AtlantisWeaponComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "BaseInteractable.h"
+#include "Interactables/BaseInteractable.h"
 #include "AtlantisDefines.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);

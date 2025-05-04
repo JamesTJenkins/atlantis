@@ -1,9 +1,9 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "LanguageTranslate.h"
+#include "Interactables/LanguageTranslate.h"
 #include "TimerManager.h"
-#include "AtlantisPlayerController.h"
-#include "ResearcherPlayerCharacter.h"
+#include "Player/AtlantisPlayerController.h"
+#include "Player/ResearcherPlayerCharacter.h"
 
 ALanguageTranslate::ALanguageTranslate() : Super() {
 	PrimaryActorTick.bCanEverTick = false;

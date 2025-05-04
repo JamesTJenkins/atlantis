@@ -1,9 +1,9 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "AtlantisPlayerController.h"
-#include "ResearcherHUD.h"
-#include "ResearcherPlayerCharacter.h"
-#include "LanguageTranslate.h"
+#include "Player/AtlantisPlayerController.h"
+#include "HUD/ResearcherHUD.h"
+#include "Player/ResearcherPlayerCharacter.h"
+#include "Interactables/LanguageTranslate.h"
 
 void AAtlantisPlayerController::ShowTranslatedTextToResearcher_Implementation(ALanguageTranslate* translate) {
 	if(AResearcherHUD* researcherHUD = Cast<AResearcherHUD>(GetHUD())) {

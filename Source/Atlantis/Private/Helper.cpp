@@ -2,7 +2,7 @@
 
 #include "Helper.h"
 #include "FindSessionsCallbackProxy.h"
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
 

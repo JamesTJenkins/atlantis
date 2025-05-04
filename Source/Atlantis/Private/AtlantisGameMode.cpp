@@ -1,15 +1,15 @@
 // Copyright James Jenkins All Rights Reserved.
 
 #include "AtlantisGameMode.h"
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/PlayerStartPIE.h"
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
-#include "BodyguardPlayerCharacter.h"
-#include "ResearcherPlayerCharacter.h"
-#include "AtlantisPlayerState.h"
+#include "Player/BodyguardPlayerCharacter.h"
+#include "Player/ResearcherPlayerCharacter.h"
+#include "Player/AtlantisPlayerState.h"
 #include "AtlantisGameInstance.h"
 
 AAtlantisGameMode::AAtlantisGameMode() : Super() {

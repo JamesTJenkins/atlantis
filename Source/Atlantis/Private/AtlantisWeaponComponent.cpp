@@ -1,7 +1,7 @@
 // Copyright James Jenkins. All Rights Reserved.
 
 #include "AtlantisWeaponComponent.h"
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 #include "AtlantisProjectile.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"

@@ -1,7 +1,7 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "ResearcherPlayerCharacter.h"
-#include "ResearcherHUD.h"
+#include "Player/ResearcherPlayerCharacter.h"
+#include "HUD/ResearcherHUD.h"
 
 AResearcherPlayerCharacter::AResearcherPlayerCharacter() : Super() {
 	currentInteractable = nullptr;

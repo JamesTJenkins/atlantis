@@ -5,7 +5,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
 #include "PatrolPoint.h"
-#include "BaseEnemyCharacter.h"
+#include "Enemy/BaseEnemyCharacter.h"
 #include "AtlantisDefines.h"
 
 UBTTask_FindRandomPatrolTask::UBTTask_FindRandomPatrolTask() : Super() {

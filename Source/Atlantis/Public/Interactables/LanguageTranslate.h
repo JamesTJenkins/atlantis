@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseInteractable.h"
+#include "Interactables/BaseInteractable.h"
 #include "../Plugins/Experimental/Text3D/Source/Text3D/Public/Text3DComponent.h"
 #include "LanguageTranslate.generated.h"
 

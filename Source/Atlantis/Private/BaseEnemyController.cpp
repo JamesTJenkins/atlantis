@@ -1,13 +1,13 @@
 // Copyright James Jenkins All Rights Reserved.
 
-#include "BaseEnemyController.h"
+#include "Enemy/BaseEnemyController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "AtlantisDefines.h"
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 #include "TimerManager.h"
 
 ABaseEnemyController::ABaseEnemyController() : Super() {

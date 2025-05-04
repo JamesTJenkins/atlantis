@@ -1,6 +1,6 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "ProloguePawn.h"
+#include "Player/ProloguePawn.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"

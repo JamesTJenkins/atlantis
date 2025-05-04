@@ -2,7 +2,7 @@
 
 #include "OxygenZones/OxygenZoneBox.h"
 #include <Components/BoxComponent.h>
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 
 AOxygenZoneBox::AOxygenZoneBox() : Super() {
 	PrimaryActorTick.bCanEverTick = false;

@@ -1,6 +1,6 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "BaseInteractable.h"
+#include "Interactables/BaseInteractable.h"
 
 ABaseInteractable::ABaseInteractable() : Super() {
 	PrimaryActorTick.bCanEverTick = false;

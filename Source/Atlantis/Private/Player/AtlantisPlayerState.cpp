@@ -1,11 +1,11 @@
 // Copyright James Jenkins. All Rights Reserved.
 
-#include "AtlantisPlayerState.h"
+#include "Player/AtlantisPlayerState.h"
 #include "AtlantisGameMode.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
-#include "BodyguardHUD.h"
-#include "ResearcherHUD.h"
+#include "HUD/BodyguardHUD.h"
+#include "HUD/ResearcherHUD.h"
 
 #define PROLOGUE_LEVEL_NAME FString("/Game/Atlantis/Levels/Prologue")
 

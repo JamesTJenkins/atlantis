@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
-#include "AtlantisCharacter.h"
+#include "Player/AtlantisCharacter.h"
 #include "BaseInteractable.generated.h"
 
 UCLASS()
