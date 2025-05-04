@@ -116,6 +116,12 @@ public:
 
 	UFUNCTION()
 	virtual void UpdateHealth(float value) override;
+
+	UFUNCTION()
+	void AddKeyId(FName id);
+
+	UFUNCTION()
+	bool CheckForId(FName id);
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = Weapons)
 	void NotifySwitchWeapon();
@@ -148,5 +154,7 @@ protected:
 	virtual void Tick(float deltaTime) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+private:
+	TArray<FName> currentKeyIds;
 };
 

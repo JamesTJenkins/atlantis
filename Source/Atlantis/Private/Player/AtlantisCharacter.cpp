@@ -172,6 +172,15 @@ void AAtlantisCharacter::UpdateHealth(float value) {
 	}
 }
 
+void AAtlantisCharacter::AddKeyId(FName id) {
+	currentKeyIds.Add(id);
+	// TODO: update UI to display key
+}
+
+bool AAtlantisCharacter::CheckForId(FName id) {
+	return currentKeyIds.Contains(id);
+}
+
 void AAtlantisCharacter::Fire() {
 	if(weapons[currentWeaponIndex] == nullptr)
 		return;
