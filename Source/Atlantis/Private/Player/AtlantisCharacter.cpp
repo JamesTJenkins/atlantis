@@ -206,7 +206,9 @@ ABaseInteractable* AAtlantisCharacter::GetInteractable() {
 
 	FHitResult result;
 	if(GetWorld()->LineTraceSingleByChannel(result, start, end, ECC_Visibility, params)) {
-		return Cast<ABaseInteractable>(result.GetActor());
+		if (result.GetComponent()->ComponentHasTag(INTERACT_TAG)) {
+			return Cast<ABaseInteractable>(result.GetActor());
+		}
 	}
 
 	return nullptr;
