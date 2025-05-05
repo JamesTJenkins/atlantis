@@ -4,6 +4,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "CharacterInterface.h"
+#include "AtlantisDefines.h"
+#include "ShootableInterface.h"
 
 AAtlantisProjectile::AAtlantisProjectile() {
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
@@ -35,6 +37,12 @@ void AAtlantisProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 		} else {
 			if (OtherComp->IsSimulatingPhysics())
 				OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		}
+
+		if(OtherComp->ComponentHasTag(SHOOTABLE_TAG)) {
+			if(IShootableInterface* shootable = Cast<IShootableInterface>(OtherActor)) {
+				shootable->OnHit(OtherComp);
+			}
 		}
 
 		Destroy();

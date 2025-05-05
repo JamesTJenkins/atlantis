@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "BaseInteractable.h"
+#include "ShootableInterface.h"
 #include "SpinCrane.generated.h"
 
 class UStaticMeshComponent;
 
 UCLASS()
-class ATLANTIS_API ASpinCrane : public ABaseInteractable {
+class ATLANTIS_API ASpinCrane : public ABaseInteractable, public IShootableInterface {
 	GENERATED_BODY()
 public:
 	ASpinCrane();
@@ -17,7 +18,11 @@ public:
 	virtual void OnInteractHold(AAtlantisCharacter* playerCharacter, float deltaTime) override;
 
 	virtual void Tick(float deltaTime) override;
+
+	virtual void OnHit(UPrimitiveComponent* hitComponent) override;
 private:
+	bool IsRaised();
+
 	UPROPERTY(VisibleAnywhere, Category = Mesh);
 	UStaticMeshComponent* craneBottom;
 

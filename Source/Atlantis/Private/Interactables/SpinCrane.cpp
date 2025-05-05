@@ -3,6 +3,7 @@
 #include "Interactables/SpinCrane.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "AtlantisDefines.h"
 
 ASpinCrane::ASpinCrane() : Super() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -23,12 +24,14 @@ ASpinCrane::ASpinCrane() : Super() {
 	rotateRightHitbox->SetHiddenInGame(true);
 	rotateRightHitbox->SetCollisionProfileName(TEXT("BlockAll"));
 	rotateRightHitbox->SetEnableGravity(false);
+	rotateRightHitbox->ComponentTags.Add(SHOOTABLE_TAG);
 
 	rotateLeftHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("RotateLeftHitbox"));
 	rotateLeftHitbox->SetupAttachment(craneLoad);
 	rotateLeftHitbox->SetHiddenInGame(true);
 	rotateLeftHitbox->SetCollisionProfileName(TEXT("BlockAll"));
 	rotateLeftHitbox->SetEnableGravity(false);
+	rotateLeftHitbox->ComponentTags.Add(SHOOTABLE_TAG);
 
 	currentlyInteracting = false;
 	raiseAmount = 50;
@@ -56,7 +59,7 @@ void ASpinCrane::Tick(float deltaTime) {
 	if(currentlyInteracting) {
 		currentlyInteracting = false;
 	} else {
-		if(craneLoad->GetRelativeLocation().Z <= lowestLoadZPos)
+		if(!IsRaised())
 			return;
 
 		FVector loc = craneLoad->GetRelativeLocation();
@@ -67,4 +70,25 @@ void ASpinCrane::Tick(float deltaTime) {
 
 		craneLoad->SetRelativeLocation(loc);
 	}
+}
+
+void ASpinCrane::OnHit(UPrimitiveComponent* hitComponent) {
+	if (!IsRaised())
+		return;
+
+	if(hitComponent == rotateRightHitbox) {
+		FRotator currentRotation = craneTop->GetRelativeRotation();
+		currentRotation.Yaw -= 90;
+		craneTop->SetRelativeRotation(currentRotation);
+	}
+
+	if(hitComponent == rotateLeftHitbox) {
+		FRotator currentRotation = craneTop->GetRelativeRotation();
+		currentRotation.Yaw += 90;
+		craneTop->SetRelativeRotation(currentRotation);
+	}
+}
+
+bool ASpinCrane::IsRaised() {
+	return craneLoad->GetRelativeLocation().Z > lowestLoadZPos;
 }
