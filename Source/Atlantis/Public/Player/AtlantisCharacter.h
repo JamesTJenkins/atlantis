@@ -136,10 +136,14 @@ protected:
 	void ReplicateSwitchWeapon(int newWeaponIndex);
 
 	void Interact();
+	void ReleaseInteract();
 
 	// Theres no replicate callback as interaction will be handled by the actor that is being interacted with instead
 	UFUNCTION(Server, Unreliable)
 	void RequestInteract();
+
+	UFUNCTION(Server, Unreliable)
+	void RequestInteractRelease();
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -156,5 +160,6 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
 	TArray<FName> currentKeyIds;
+	bool interactHold;
 };
 
