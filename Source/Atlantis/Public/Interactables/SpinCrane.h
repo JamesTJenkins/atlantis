@@ -22,6 +22,7 @@ public:
 	virtual void OnHit(UPrimitiveComponent* hitComponent) override;
 private:
 	bool IsRaised();
+	bool CanRotate(float yaw);
 
 	UPROPERTY(VisibleAnywhere, Category = Mesh);
 	UStaticMeshComponent* craneBottom;
@@ -49,6 +50,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Crane)
 	float highestLoadZPos;
+
+	UPROPERTY(EditAnywhere, Category = Crane)
+	float minCraneYawRotation;
+
+	UPROPERTY(EditAnywhere, Category = Crane)
+	float maxCraneYawRotation;
 
 	bool currentlyInteracting;
 };

@@ -36,6 +36,8 @@ ASpinCrane::ASpinCrane() : Super() {
 	currentlyInteracting = false;
 	raiseAmount = 50;
 	lowerAmount = 50;
+	minCraneYawRotation = 0;
+	maxCraneYawRotation = 360;
 }
 
 void ASpinCrane::OnInteractHold(AAtlantisCharacter* playerCharacter, float deltaTime) {
@@ -79,16 +81,28 @@ void ASpinCrane::OnHit(UPrimitiveComponent* hitComponent) {
 	if(hitComponent == rotateRightHitbox) {
 		FRotator currentRotation = craneTop->GetRelativeRotation();
 		currentRotation.Yaw -= 90;
-		craneTop->SetRelativeRotation(currentRotation);
+
+		if (CanRotate(currentRotation.Yaw))
+			craneTop->SetRelativeRotation(currentRotation);
 	}
 
 	if(hitComponent == rotateLeftHitbox) {
 		FRotator currentRotation = craneTop->GetRelativeRotation();
 		currentRotation.Yaw += 90;
-		craneTop->SetRelativeRotation(currentRotation);
+
+		if(CanRotate(currentRotation.Yaw))
+			craneTop->SetRelativeRotation(currentRotation);
 	}
 }
 
 bool ASpinCrane::IsRaised() {
 	return craneLoad->GetRelativeLocation().Z > lowestLoadZPos;
+}
+
+bool ASpinCrane::CanRotate(float yaw) {
+	// If 360 max rotation always return true
+	if (maxCraneYawRotation >= 360)
+		return true;
+		
+	return yaw >= minCraneYawRotation && yaw <= maxCraneYawRotation;
 }
