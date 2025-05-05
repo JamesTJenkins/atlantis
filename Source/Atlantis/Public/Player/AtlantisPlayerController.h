@@ -14,5 +14,13 @@ class ATLANTIS_API AAtlantisPlayerController : public APlayerController {
 	GENERATED_BODY()
 public:
 	UFUNCTION(Client, Reliable)
+	void ShowTempMessage(const FText& text);
+
+	UFUNCTION()
+	void TempMessageEnd();
+
+	UFUNCTION(Client, Reliable)
 	void ShowTranslatedTextToResearcher(ALanguageTranslate* translate);
+private:
+	FTimerHandle tempMessageHandle;
 };
