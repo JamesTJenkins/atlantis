@@ -15,6 +15,7 @@ public:
 	ABaseInteractable();
 
 	virtual void OnInteract(AAtlantisCharacter* playerCharacter) {};
+	virtual void OnInteractHold(AAtlantisCharacter* playerCharacter, float deltaTime) {};
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Interaction);
 	UBoxComponent* interactBox;

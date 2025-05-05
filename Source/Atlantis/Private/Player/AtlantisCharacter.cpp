@@ -64,6 +64,7 @@ AAtlantisCharacter::AAtlantisCharacter() {
 
 	Tags.Add(PLAYER_TAG);
 
+	interactHold = false;
 	movementEnabled = true;
 	maxHealth = 100;
 	health = 100;
@@ -95,8 +96,7 @@ void AAtlantisCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(switchWeaponAction, ETriggerEvent::Started, this, &AAtlantisCharacter::SwitchWeapon);
 		EnhancedInputComponent->BindAction(reloadAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Reload);
 		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Started, this, &AAtlantisCharacter::Interact);
-	} else {
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		EnhancedInputComponent->BindAction(interactAction, ETriggerEvent::Completed, this, &AAtlantisCharacter::ReleaseInteract);
 	}
 }
 
@@ -112,6 +112,12 @@ void AAtlantisCharacter::Tick(float deltaTime) {
 			if(oxygen < 0) {
 				// TODO: come back once the player can actually die and respawn
 				UE_LOG(LogTemp, Log, TEXT("Died of lack of oxygen"));
+			}
+		}
+
+		if(interactHold) {
+			if(ABaseInteractable* interactable = GetInteractable()) {
+				interactable->OnInteractHold(this, deltaTime);
 			}
 		}
 	}
@@ -207,16 +213,23 @@ ABaseInteractable* AAtlantisCharacter::GetInteractable() {
 }
 
 void AAtlantisCharacter::Interact() {
-	// Might want to do other stuff in here like a hold to interact or even handle validation here
-	// rather than leaving it to the server to validate
-	
 	RequestInteract();
+}
+
+void AAtlantisCharacter::ReleaseInteract() {
+	RequestInteractRelease();
 }
 
 void AAtlantisCharacter::RequestInteract_Implementation() {
 	if(ABaseInteractable* interactable = GetInteractable()) {
 		interactable->OnInteract(this);
 	}
+
+	interactHold = true;
+}
+
+void AAtlantisCharacter::RequestInteractRelease_Implementation() {
+	interactHold = false;
 }
 
 void AAtlantisCharacter::SwitchWeapon() {
