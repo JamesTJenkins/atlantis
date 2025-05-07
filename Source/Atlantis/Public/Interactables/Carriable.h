@@ -16,8 +16,12 @@ public:
 
 	virtual void OnInteract(AAtlantisCharacter* playerCharacter) override;
 
-	void SetPhysics(bool enabled);
+	void EnableDampening(bool enabled);
+	void AddForce(FVector force);
 private:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
 	UStaticMeshComponent* staticMesh;
+
+	float originalLinearDampening;
+	float originalAngularDampening;
 };

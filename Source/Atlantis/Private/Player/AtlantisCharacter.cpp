@@ -76,6 +76,7 @@ AAtlantisCharacter::AAtlantisCharacter() {
 	oxygen = 100;
 	oxygenLossPerSecond = 1;
 	oxygenRegenPerSecond = 10;
+	holdForceStrength = 25;
 }
 
 void AAtlantisCharacter::NotifyControllerChanged() {
@@ -122,7 +123,19 @@ void AAtlantisCharacter::Tick(float deltaTime) {
 				interactable->OnInteractHold(this, deltaTime);
 			}
 		}
+
+		if(currentCarriable) {
+			FVector targetLoc = firstPersonCameraComponent->GetComponentLocation() + firstPersonCameraComponent->GetForwardVector() * carriableHoldDistance;
+			FVector moveDir = targetLoc - currentCarriable->GetActorLocation();
+			float distance = moveDir.Size();
+
+			if (distance > 5) {
+				moveDir.Normalize();
+				float forceMagnitude = distance * holdForceStrength;
+				currentCarriable->AddForce(moveDir * forceMagnitude);
+			}
 	}
+}
 }
 
 void AAtlantisCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
@@ -205,8 +218,10 @@ void AAtlantisCharacter::HandleClientSidePickupCarriable(ACarriable* carriable) 
 		carriable->SetPhysics(false);
 		carriable->AttachToComponent(firstPersonCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
 		weapons[currentWeaponIndex]->SetVisibility(false);
+		carriableHoldDistance = FVector::Distance(firstPersonCameraComponent->GetComponentLocation(), carriable->GetActorLocation());
+		carriable->EnableDampening(true);
 	} else {
-		currentCarriable->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		currentCarriable->EnableDampening(false);
 		weapons[currentWeaponIndex]->SetVisibility(true);
 		currentCarriable->SetPhysics(true);
 	}
