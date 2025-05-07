@@ -94,6 +94,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction, meta = (AllowPrivateAccess = "true"))
 	ACarriable* currentCarriable;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction, meta = (AllowPrivateAccess = "true"))
+	float holdForceStrength;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Interaction, meta = (AllowPrivateAccess = "true"))
 	float interactDistance;
 
@@ -174,5 +177,6 @@ protected:
 private:
 	TArray<FName> currentKeyIds;
 	bool interactHold;
+	float carriableHoldDistance;
 };
 
