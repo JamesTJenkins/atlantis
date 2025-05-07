@@ -14,6 +14,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Interactables/BaseInteractable.h"
 #include "AtlantisDefines.h"
+#include "Interactables/Carriable.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -64,6 +65,7 @@ AAtlantisCharacter::AAtlantisCharacter() {
 
 	Tags.Add(PLAYER_TAG);
 
+	currentCarriable = nullptr;
 	interactHold = false;
 	movementEnabled = true;
 	maxHealth = 100;
@@ -187,14 +189,51 @@ bool AAtlantisCharacter::CheckForId(FName id) {
 	return currentKeyIds.Contains(id);
 }
 
+void AAtlantisCharacter::PickupCarriable(ACarriable* carriable) {
+	RequestPickupCarriable(carriable);
+
+	if(!HasAuthority()) {
+		HandleClientSidePickupCarriable(carriable);
+	}
+}
+
+void AAtlantisCharacter::HandleClientSidePickupCarriable(ACarriable* carriable) {
+	if (carriable == currentCarriable)
+		return;
+
+	if (carriable) {
+		carriable->SetPhysics(false);
+		carriable->AttachToComponent(firstPersonCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
+		weapons[currentWeaponIndex]->SetVisibility(false);
+	} else {
+		currentCarriable->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		weapons[currentWeaponIndex]->SetVisibility(true);
+		currentCarriable->SetPhysics(true);
+	}
+
+	currentCarriable = carriable;
+	NotifySwitchWeapon();
+}
+
+void AAtlantisCharacter::RequestPickupCarriable_Implementation(ACarriable* carriable) {
+	ReplicatePickupCarriable(carriable);
+}
+
+void AAtlantisCharacter::ReplicatePickupCarriable_Implementation(ACarriable* carriable) {
+	HandleClientSidePickupCarriable(carriable);
+}
+
 void AAtlantisCharacter::Fire() {
-	if(weapons[currentWeaponIndex] == nullptr)
+	if(weapons[currentWeaponIndex] == nullptr || currentCarriable != nullptr)
 		return;
 
 	weapons[currentWeaponIndex]->Fire();
 }
 
 void AAtlantisCharacter::Reload() {
+	if (!currentCarriable)
+		return;
+
 	weapons[currentWeaponIndex]->Reload();
 }
 
@@ -215,6 +254,11 @@ ABaseInteractable* AAtlantisCharacter::GetInteractable() {
 }
 
 void AAtlantisCharacter::Interact() {
+	if(currentCarriable) {
+		PickupCarriable(nullptr);
+		return;
+	}
+
 	RequestInteract();
 }
 
@@ -235,6 +279,10 @@ void AAtlantisCharacter::RequestInteractRelease_Implementation() {
 }
 
 void AAtlantisCharacter::SwitchWeapon() {
+	if(currentCarriable) {
+		PickupCarriable(nullptr);
+	}
+
 	int newIndex = (currentWeaponIndex + 1) % weapons.Num();
 	RequestSwitchWeapon(newIndex);
 

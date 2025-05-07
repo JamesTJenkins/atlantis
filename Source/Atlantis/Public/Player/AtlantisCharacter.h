@@ -16,6 +16,7 @@ class UInputMappingContext;
 class UAtlantisWeaponComponent;
 class ABaseInteractable;
 struct FInputActionValue;
+class ACarriable;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -90,6 +91,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapons, meta = (AllowPrivateAccess = "true"))
 	int currentWeaponIndex;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction, meta = (AllowPrivateAccess = "true"))
+	ACarriable* currentCarriable;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Interaction, meta = (AllowPrivateAccess = "true"))
 	float interactDistance;
 
@@ -122,7 +126,19 @@ public:
 
 	UFUNCTION()
 	bool CheckForId(FName id);
+
+	void PickupCarriable(ACarriable* carriable);
+	void Interact();
+	void ReleaseInteract();
 protected:
+	void HandleClientSidePickupCarriable(ACarriable* carriable);
+
+	UFUNCTION(Server, Unreliable)
+	void RequestPickupCarriable(ACarriable* carriable);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReplicatePickupCarriable(ACarriable* carriable);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = Weapons)
 	void NotifySwitchWeapon();
 
@@ -134,9 +150,6 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void ReplicateSwitchWeapon(int newWeaponIndex);
-
-	void Interact();
-	void ReleaseInteract();
 
 	// Theres no replicate callback as interaction will be handled by the actor that is being interacted with instead
 	UFUNCTION(Server, Unreliable)
