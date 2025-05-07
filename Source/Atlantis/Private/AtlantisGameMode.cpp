@@ -11,6 +11,7 @@
 #include "Player/ResearcherPlayerCharacter.h"
 #include "Player/AtlantisPlayerState.h"
 #include "AtlantisGameInstance.h"
+#include "AtlantisDefines.h"
 
 AAtlantisGameMode::AAtlantisGameMode() : Super() {
 	static ConstructorHelpers::FClassFinder<APawn> menuPawnClass(TEXT("/Game/Atlantis/Blueprints/P_MenuPawn"));
@@ -56,9 +57,9 @@ AActor* AAtlantisGameMode::ChoosePlayerStart_Implementation(AController* player)
 	for(TActorIterator<APlayerStart> it(world); it; ++it) {
 		APlayerStart* playerStart = *it;
 
-		if(state->playerRole == EPlayerRole::Bodyguard && playerStart->PlayerStartTag.Compare("Bodyguard")) {
+		if(state->playerRole == EPlayerRole::Bodyguard && playerStart->PlayerStartTag == BODYGUARD_TAG) {
 			return playerStart;
-		} else if (state->playerRole == EPlayerRole::Researcher && playerStart->PlayerStartTag.Compare("Researcher")) {
+		} else if (state->playerRole == EPlayerRole::Researcher && playerStart->PlayerStartTag == RESEARCHER_TAG) {
 			return playerStart;
 		} else if(state->playerRole == EPlayerRole::None) {
 			return playerStart;
