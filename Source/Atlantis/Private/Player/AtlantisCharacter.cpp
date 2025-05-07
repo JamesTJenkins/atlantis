@@ -134,14 +134,16 @@ void AAtlantisCharacter::Tick(float deltaTime) {
 				float forceMagnitude = distance * holdForceStrength;
 				currentCarriable->AddForce(moveDir * forceMagnitude);
 			}
+		}
 	}
-}
 }
 
 void AAtlantisCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AAtlantisCharacter, oxygen);
 	DOREPLIFETIME(AAtlantisCharacter, maxOxygen);
+	DOREPLIFETIME(AAtlantisCharacter, health);
+	DOREPLIFETIME(AAtlantisCharacter, maxHealth);
 }
 
 void AAtlantisCharacter::Move(const FInputActionValue& Value) {
@@ -215,15 +217,12 @@ void AAtlantisCharacter::HandleClientSidePickupCarriable(ACarriable* carriable) 
 		return;
 
 	if (carriable) {
-		carriable->SetPhysics(false);
-		carriable->AttachToComponent(firstPersonCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
 		weapons[currentWeaponIndex]->SetVisibility(false);
 		carriableHoldDistance = FVector::Distance(firstPersonCameraComponent->GetComponentLocation(), carriable->GetActorLocation());
 		carriable->EnableDampening(true);
 	} else {
 		currentCarriable->EnableDampening(false);
 		weapons[currentWeaponIndex]->SetVisibility(true);
-		currentCarriable->SetPhysics(true);
 	}
 
 	currentCarriable = carriable;
