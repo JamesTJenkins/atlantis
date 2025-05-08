@@ -8,6 +8,8 @@
 ALockedDoor::ALockedDoor() : Super() {
 	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
 	staticMesh->AttachToComponent(interactBox, FAttachmentTransformRules::KeepRelativeTransform);
+
+	bReplicates = true;
 }
 
 void ALockedDoor::OnInteract(AAtlantisCharacter* playerCharacter) {

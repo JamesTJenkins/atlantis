@@ -8,6 +8,8 @@
 ADoorKey::ADoorKey() : Super() {
 	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("KeyMesh"));
 	staticMesh->AttachToComponent(interactBox, FAttachmentTransformRules::KeepRelativeTransform);
+
+	bReplicates = true;
 }
 
 void ADoorKey::OnInteract(AAtlantisCharacter* playerCharacter) {
@@ -18,4 +20,6 @@ void ADoorKey::OnInteract(AAtlantisCharacter* playerCharacter) {
 		FText formattedText = FText::Format(NSLOCTEXT("Namespace", "Key", "Collected {0}"), FText::FromName(keyId));
 		controller->ShowTempMessage(formattedText);
 	}
+
+	Destroy();
 }

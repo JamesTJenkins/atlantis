@@ -10,6 +10,20 @@ ACarriable::ACarriable() : Super() {
 	
 	interactBox->SetSimulatePhysics(true);
 	interactBox->SetEnableGravity(true);
+
+	bReplicates = true;
+	SetReplicates(true);
+
+	FRepMovement replMove;
+	replMove.LinearVelocity = FVector::ZeroVector;
+	replMove.AngularVelocity = FVector::ZeroVector;
+	replMove.Location = FVector::ZeroVector;
+	replMove.Rotation = FRotator::ZeroRotator;
+	replMove.bSimulatedPhysicSleep = false;
+	replMove.bRepPhysics = false;
+	SetReplicatedMovement(replMove);
+
+	interactBox->SetIsReplicated(true);
 }
 
 void ACarriable::OnInteract(AAtlantisCharacter* playerCharacter) {
