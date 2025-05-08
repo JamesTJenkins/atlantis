@@ -136,6 +136,10 @@ void AAtlantisCharacter::Tick(float deltaTime) {
 			}
 		}
 	}
+
+	if (IsLocallyControlled()) {
+		RequestUpdateCameraPitch(firstPersonCameraComponent->GetComponentRotation().Pitch);
+	}
 }
 
 void AAtlantisCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
@@ -249,6 +253,18 @@ void AAtlantisCharacter::Reload() {
 		return;
 
 	weapons[currentWeaponIndex]->Reload();
+}
+
+void AAtlantisCharacter::RequestUpdateCameraPitch_Implementation(const float newPitch) {
+	ReplicateUpdatedCameraPitch(newPitch);
+}
+
+void AAtlantisCharacter::ReplicateUpdatedCameraPitch_Implementation(const float newPitch) {
+	if(!IsLocallyControlled()) {
+		FRotator newRotation = firstPersonCameraComponent->GetComponentRotation();
+		newRotation.Pitch = newPitch;
+		firstPersonCameraComponent->SetWorldRotation(newRotation);
+	}
 }
 
 ABaseInteractable* AAtlantisCharacter::GetInteractable() {

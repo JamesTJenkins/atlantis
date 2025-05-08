@@ -166,6 +166,12 @@ protected:
 	void Fire();
 	void Reload();
 
+	UFUNCTION(Server, Unreliable)
+	void RequestUpdateCameraPitch(const float newPitch);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void ReplicateUpdatedCameraPitch(const float newPitch);
+
 	ABaseInteractable* GetInteractable();
 
 	virtual void NotifyControllerChanged() override;
