@@ -33,6 +33,7 @@ ASpinCrane::ASpinCrane() : Super() {
 	rotateLeftHitbox->SetEnableGravity(false);
 	rotateLeftHitbox->ComponentTags.Add(SHOOTABLE_TAG);
 
+	bReplicates = true;
 	currentlyInteracting = false;
 	raiseAmount = 50;
 	lowerAmount = 50;
@@ -43,16 +44,19 @@ ASpinCrane::ASpinCrane() : Super() {
 void ASpinCrane::OnInteractHold(AAtlantisCharacter* playerCharacter, float deltaTime) {
 	currentlyInteracting = true;
 
-	if(craneLoad->GetRelativeLocation().Z >= highestLoadZPos)
-		return;
-
 	FVector loc = craneLoad->GetRelativeLocation();
+	if(loc.Z >= highestLoadZPos) {
+		UpdateLoadLocation(loc.Z);
+		return;
+	}
+
 	loc.Z += raiseAmount * deltaTime;
 
 	if(loc.Z > highestLoadZPos)
 		loc.Z = highestLoadZPos;
 
 	craneLoad->SetRelativeLocation(loc);
+	UpdateLoadLocation(loc.Z);
 }
 
 void ASpinCrane::Tick(float deltaTime) {
@@ -71,6 +75,7 @@ void ASpinCrane::Tick(float deltaTime) {
 			loc.Z = lowestLoadZPos;
 
 		craneLoad->SetRelativeLocation(loc);
+		UpdateLoadLocation(loc.Z);
 	}
 }
 
@@ -92,6 +97,14 @@ void ASpinCrane::OnHit(UPrimitiveComponent* hitComponent) {
 
 		if(CanRotate(currentRotation.Yaw))
 			craneTop->SetRelativeRotation(currentRotation);
+	}
+}
+
+void ASpinCrane::UpdateLoadLocation_Implementation(const float zLocation) {
+	if(!HasAuthority()) {
+		FVector loc = craneLoad->GetRelativeLocation();
+		loc.Z = zLocation;
+		craneLoad->SetRelativeLocation(loc);
 	}
 }
 

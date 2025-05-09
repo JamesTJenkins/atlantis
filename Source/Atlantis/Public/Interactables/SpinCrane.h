@@ -20,6 +20,9 @@ public:
 	virtual void Tick(float deltaTime) override;
 
 	virtual void OnHit(UPrimitiveComponent* hitComponent) override;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void UpdateLoadLocation(const float zLocation);
 private:
 	bool IsRaised();
 	bool CanRotate(float yaw);
