@@ -193,7 +193,7 @@ void AAtlantisCharacter::OnRep_MaxOxygen() {
 void AAtlantisCharacter::UpdateHealth(float value) {
 	health += value;
 
-	if(health < value) {
+	if(health <= value) {
 		// TODO: implement respawns or revive mechanic
 		UE_LOG(LogTemp, Log, TEXT("Player died"));
 	}
