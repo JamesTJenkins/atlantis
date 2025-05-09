@@ -20,22 +20,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Reload();
 
-	UFUNCTION(Server, Unreliable)
-	void RequestFire(const FRotator& cameraRotation);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void FireComplete(const FRotator& cameraRotation);
-
-	UFUNCTION(Server, Reliable)
-	void RequestReload();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void ReloadComplete();
-
-	void HandleClientSideFire(const FRotator& cameraRotation);
-	
-	void HandleClientSideReload();
-
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AAtlantisProjectile> projectileClass;
 
@@ -57,7 +41,34 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	int maxAmmoPerMag;
 
-	bool requestedReload;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float timeBetweenShots;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float timeToReload;
 
 	AAtlantisCharacter* Character;
+private:
+	UFUNCTION(Server, Unreliable)
+	void RequestFire(const FRotator& cameraRotation);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void FireComplete(const FRotator& cameraRotation);
+
+	UFUNCTION(Server, Reliable)
+	void RequestReload();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReloadComplete();
+
+	void HandleClientSideFire(const FRotator& cameraRotation);
+	void HandleClientSideReload();
+	void StartShotTimer();
+	void FinishedShot();
+	void StartReloadTimer();
+
+	bool requestedReload;
+	bool midShot;
+	FTimerHandle shotTimerHandle;
+	FTimerHandle reloadTimerHandle;
 };
