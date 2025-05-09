@@ -249,7 +249,7 @@ void AAtlantisCharacter::Fire() {
 }
 
 void AAtlantisCharacter::Reload() {
-	if (!currentCarriable)
+	if (currentCarriable != nullptr)
 		return;
 
 	weapons[currentWeaponIndex]->Reload();
